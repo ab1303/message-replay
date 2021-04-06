@@ -6,5 +6,5 @@ export enum SideNavMode {
 }
 
 export const MENU = [
-  { to: routeTo(Path.USERS_ROOT), label: 'Messages' },
+  { to: routeTo(Path.USERS_ROOT), label: 'Service Bus Topic' },
 ];

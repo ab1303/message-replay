@@ -3,7 +3,6 @@ import { Box, BoxProps } from '@chakra-ui/core';
 
 import { SideNavMode, MENU } from './modules/constants';
 import SideNavItem from './SideNavItem';
-import SideNavLogo from './SideNavLogo';
 import SideNavProfile from './SideNavProfile';
 
 type Props = BoxProps & {
@@ -15,7 +14,7 @@ const SideNavContent: React.FC<Props> = ({ mode, ...props }) => (
     <SideNavProfile mode={mode} />
 
     <Box mt="6">
-      {MENU.map(item => (
+      {MENU.map((item) => (
         <SideNavItem key={item.to} to={item.to} mode={mode}>
           {item.label}
         </SideNavItem>

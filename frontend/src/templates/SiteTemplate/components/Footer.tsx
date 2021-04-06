@@ -33,13 +33,7 @@ const Footer: React.FC = () => {
       >
         <Text>
           Copyright © {`${new Date().getFullYear()} `}
-          <Link
-            href="https://github.com/felippepuhle"
-            isExternal
-            color={linkColor}
-          >
-            Felippe Rodrigo Puhle
-          </Link>
+          <Link isExternal color={linkColor}></Link>
         </Text>
       </Flex>
     </Box>

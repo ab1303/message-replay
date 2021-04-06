@@ -49,6 +49,9 @@ const SideNavProfile: React.FC<Props> = ({ mode }) => {
         <SideNavItem to="/profile" mode={mode}>
           Profile
         </SideNavItem>
+        <SideNavItem to="/settings" mode={mode}>
+          Settings
+        </SideNavItem>
       </Collapse>
     </Box>
   );

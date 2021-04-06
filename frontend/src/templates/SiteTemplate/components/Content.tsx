@@ -4,6 +4,7 @@ import { Switch, Route } from 'react-router-dom';
 
 import { Path, routeTo } from 'src/router';
 import Home from 'src/routes/Home';
+import Settings from 'src/routes/Settings';
 import Users from 'src/routes/Users';
 
 const Content: React.FC = () => {
@@ -23,6 +24,7 @@ const Content: React.FC = () => {
       >
         <Switch>
           <Route exact path={routeTo(Path.PROFILE)} component={Home} />
+          <Route exact path={routeTo(Path.Settings)} component={Settings} />
           <Route path={routeTo(Path.USERS_ROOT)} component={Users} />
         </Switch>
       </Box>
