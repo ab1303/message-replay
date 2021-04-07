@@ -1,8 +1,8 @@
 import { useMutation } from 'react-query';
 import axios from 'axios';
 import { useContext } from 'react';
-import { AppConfigurations } from 'src/types/AppConfigurations';
-import { ConfigContext } from 'src/providers/configProvider/ConfigProvider';
+import { AppConfigurations } from 'src/types';
+import { ConfigContext } from 'src/providers/ConfigProvider';
 import { SettingsFormData } from './types';
 
 export const useSettingsMutation = () => {

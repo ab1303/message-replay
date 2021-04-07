@@ -8,7 +8,8 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import SiteTemplate from 'src/templates/SiteTemplate';
 import { THEME } from 'src/styles';
 import appConfigurations from 'src/config';
-import ConfigProvider from 'src/providers/configProvider/ConfigProvider';
+import ConfigProvider from 'src/providers/ConfigProvider';
+import { AppStateProvider } from './providers/AppStateProvider';
 
 const queryClient = new QueryClient();
 const App: React.FC = () => {
@@ -36,9 +37,11 @@ const App: React.FC = () => {
 
         <QueryClientProvider client={queryClient}>
           <ConfigProvider appConfig={appConfigurations}>
-            <Router basename={process.env.PUBLIC_URL}>
-              <Route component={SiteTemplate} />
-            </Router>
+            <AppStateProvider>
+              <Router basename={process.env.PUBLIC_URL}>
+                <Route component={SiteTemplate} />
+              </Router>
+            </AppStateProvider>
             <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
           </ConfigProvider>
         </QueryClientProvider>

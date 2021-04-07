@@ -52,7 +52,7 @@ const SideNavItem: React.FC<Props> = props => {
       color={color}
       _hover={{
         color: hoverColor,
-        transform: 'translateX(2px)',
+        transform: 'translateX(4px)',
       }}
       {...(isActive && {
         fontWeight: 'semibold',

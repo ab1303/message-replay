@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { AppConfigurations } from 'src/types/AppConfigurations';
+import { AppConfigurations } from 'src/types';
 
 export const ConfigContext = createContext<AppConfigurations>(
   {} as AppConfigurations,
