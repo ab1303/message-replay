@@ -14,7 +14,7 @@ const SideNavContent: React.FC<Props> = ({ mode, ...props }) => (
     <SideNavProfile mode={mode} />
 
     <Box mt="6">
-      {MENU.map((item) => (
+      {MENU.map(item => (
         <SideNavItem key={item.to} to={item.to} mode={mode}>
           {item.label}
         </SideNavItem>

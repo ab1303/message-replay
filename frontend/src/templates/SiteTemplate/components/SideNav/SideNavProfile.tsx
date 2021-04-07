@@ -46,9 +46,9 @@ const SideNavProfile: React.FC<Props> = ({ mode }) => {
       </Flex>
 
       <Collapse ml={2} mt={4} isOpen={isOpen}>
-        <SideNavItem to="/profile" mode={mode}>
+        {/* <SideNavItem to="/profile" mode={mode}>
           Profile
-        </SideNavItem>
+        </SideNavItem> */}
         <SideNavItem to="/settings" mode={mode}>
           Settings
         </SideNavItem>

@@ -8,35 +8,28 @@ import {
   Button,
   Box,
   Heading,
-  FormHelperText,
   Stack,
+  Spinner,
 } from '@chakra-ui/core';
-
-type SettingsFormData = {
-  connectionString: string;
-  topicName: string;
-};
+import { SettingsFormData } from './types';
+import { useSettingsMutation } from './useSettingsMutation';
 
 const Settings: React.FC = () => {
   const formMethods = useForm<SettingsFormData>({
     mode: 'onBlur',
     defaultValues: {
       connectionString: '',
-      topicName: '',
     },
   });
 
+  const settingsMutation = useSettingsMutation();
+
   const submitHandler = (formData: SettingsFormData) => {
     console.log('User Recipient Form Data:', JSON.stringify(formData, null, 2));
+    settingsMutation.mutate(formData);
   };
 
   const { handleSubmit, errors, register, formState } = formMethods;
-
-  function onSubmit(values: any) {
-    setTimeout(() => {
-      alert(JSON.stringify(values, null, 2));
-    }, 1000);
-  }
 
   return (
     <Box w={800} p={4} m="20px auto">
@@ -45,55 +38,59 @@ const Settings: React.FC = () => {
       </Heading>
 
       <FormProvider {...formMethods}>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={handleSubmit(submitHandler)}>
           <Box
             as="div"
             p={4}
             borderWidth="1px"
             rounded="lg"
             shadow="1px 1px 3px rgba(0,0,0,0.3)"
-            onSubmit={handleSubmit(submitHandler)}
           >
-            <Stack margin="auto" spacing={5}>
-              <FormControl isInvalid={!!errors.connectionString}>
-                <Stack direction="row">
-                  <FormLabel htmlFor="connectionString" w={200}>
-                    Connection String
-                  </FormLabel>
-                  <Input
-                    name="connectionString"
-                    placeholder="connectionString"
-                    ref={register({ required: true })}
-                  />
-                  <FormErrorMessage>
-                    {errors.connectionString && errors.connectionString.message}
-                  </FormErrorMessage>
-                </Stack>
-              </FormControl>
-              <FormControl isInvalid={!!errors.topicName}>
-                <Stack direction="row">
-                  <FormLabel htmlFor="topicName" w={200}>
-                    Topic Name
-                  </FormLabel>
-                  <Input
-                    name="topicName"
-                    placeholder="topicName"
-                    ref={register({ required: true })}
-                  />
-                  <FormErrorMessage>
-                    {errors.topicName && errors.topicName.message}
-                  </FormErrorMessage>
-                </Stack>
-              </FormControl>
-              <Button
-                mt={4}
-                variantColor="teal"
-                isLoading={formState.isSubmitting}
-                type="submit"
-              >
-                Save
-              </Button>
-            </Stack>
+            {settingsMutation.isLoading ? (
+              <Spinner thickness="4px" size="md" color="teal.500" />
+            ) : (
+              <Stack margin="auto" spacing={5}>
+                <FormControl isInvalid={!!errors.connectionString}>
+                  <Stack direction="row">
+                    <FormLabel htmlFor="connectionString" w={200}>
+                      Connection String
+                    </FormLabel>
+                    <Input
+                      name="connectionString"
+                      placeholder="connectionString"
+                      ref={register({ required: true })}
+                    />
+                    <FormErrorMessage>
+                      {errors.connectionString &&
+                        errors.connectionString.message}
+                    </FormErrorMessage>
+                  </Stack>
+                </FormControl>
+                {/* <FormControl isInvalid={!!errors.topicName}>
+                  <Stack direction="row">
+                    <FormLabel htmlFor="topicName" w={200}>
+                      Topic Name
+                    </FormLabel>
+                    <Input
+                      name="topicName"
+                      placeholder="topicName"
+                      ref={register({ required: true })}
+                    />
+                    <FormErrorMessage>
+                      {errors.topicName && errors.topicName.message}
+                    </FormErrorMessage>
+                  </Stack>
+                </FormControl> */}
+                <Button
+                  mt={4}
+                  variantColor="teal"
+                  isLoading={formState.isSubmitting}
+                  type="submit"
+                >
+                  Save
+                </Button>
+              </Stack>
+            )}
           </Box>
         </form>
       </FormProvider>

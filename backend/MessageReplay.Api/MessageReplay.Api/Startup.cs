@@ -1,4 +1,4 @@
-using MessageReplay.Api.Services;
+using MessageReplay.Api.Features.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -41,6 +41,17 @@ namespace MessageReplay.Api
                 c.IncludeXmlComments(xmlPath);
             });
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000")
+                         .AllowAnyHeader()
+                         .AllowAnyMethod();
+                    });
+            });
+
             // DI 
             services.AddSingleton<IGlobalSettings, GlobalSettings>();
         }
@@ -58,6 +69,8 @@ namespace MessageReplay.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 

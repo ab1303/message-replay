@@ -4,7 +4,7 @@
         <name>MessageReplay.Api</name>
     </assembly>
     <members>
-        <member name="M:MessageReplay.Api.Controllers.SettingsController.#ctor(MessageReplay.Api.Services.IGlobalSettings,Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Controllers.SettingsController})">
+        <member name="M:MessageReplay.Api.Features.Settings.SettingsController.#ctor(MessageReplay.Api.Features.Settings.IGlobalSettings,Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Settings.SettingsController})">
             <summary>
             
             </summary>

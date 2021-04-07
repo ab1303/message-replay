@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace MessageReplay.Api.Services
+﻿namespace MessageReplay.Api.Features.Settings
 {
-   
+
     public interface IGlobalSettings
     {
         string ServiceBusConnectionString { get; set; }

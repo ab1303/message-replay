@@ -1,8 +1,7 @@
-﻿using MessageReplay.Api.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace MessageReplay.Api.Controllers
+namespace MessageReplay.Api.Features.Settings
 {
 
     [ApiController]
@@ -26,18 +25,18 @@ namespace MessageReplay.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult SaveGlobalSettings(string sbConnectionString)
+        public IActionResult SaveAppSettings(SaveAppSettingsRequest request)
         {
-            _globalSettings.ServiceBusConnectionString = sbConnectionString;
+            _globalSettings.ServiceBusConnectionString = request.ConnectionString;
             return Ok();
         }
 
         [HttpGet]
-        public IActionResult FetchGlobalSettings()
+        public IActionResult FetchAppSettings()
         {
-            return Ok(new
+            return Ok(new FetchAppSettingsResponse
             {
-                ServiceBusConnectionString = _globalSettings.ServiceBusConnectionString
+                ConnectionString = _globalSettings.ServiceBusConnectionString
             });
         }
     }
