@@ -1,4 +1,4 @@
-import React, { Dispatch, useReducer } from 'react';
+import React, { Dispatch, useContext, useReducer } from 'react';
 import { appReducer } from 'src/reducer';
 import { Actions, AppState } from 'src/types';
 
@@ -30,3 +30,6 @@ export const AppStateProvider: React.FC<{
     </AppStateContext.Provider>
   );
 };
+
+export const useAppState = () => useContext(AppStateContext);
+export const useAppDispatch = () => useContext(AppDispatchContext);

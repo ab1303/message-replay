@@ -6,7 +6,7 @@ export const settingsReducer = (
   action: Actions,
 ): SettingsState => {
   switch (action.type) {
-    case SettingsEvent.CONNECTION_CHANGE:
+    case SettingsEvent.CONNECTION_CHANGED:
       return {
         connectionString: action.payload.connectionString,
       };

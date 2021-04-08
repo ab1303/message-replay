@@ -42,6 +42,7 @@ const App: React.FC = () => {
                 <Route component={SiteTemplate} />
               </Router>
             </AppStateProvider>
+
             <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
           </ConfigProvider>
         </QueryClientProvider>

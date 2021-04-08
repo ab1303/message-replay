@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Messaging.ServiceBus.Administration;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MessageReplay.Api.Features.Settings
 {
@@ -13,6 +16,9 @@ namespace MessageReplay.Api.Features.Settings
         private readonly IGlobalSettings _globalSettings;
         private readonly ILogger<SettingsController> _logger;
 
+
+        public int ServerTimeout { get; set; } = 5;
+
         /// <summary>
         /// 
         /// </summary>
@@ -25,10 +31,32 @@ namespace MessageReplay.Api.Features.Settings
         }
 
         [HttpPost]
-        public IActionResult SaveAppSettings(SaveAppSettingsRequest request)
+        public async Task<IActionResult> SaveAppSettings(SaveAppSettingsRequest request)
         {
+            var queueList = new List<string>();
+            var topicList = new List<string>();
+            var adminClient = new ServiceBusAdministrationClient(request.ConnectionString);
+
+            var queues = adminClient.GetQueuesAsync();
+            var topics = adminClient.GetTopicsAsync();
+
+
+            await foreach (var queueProp in queues)
+            {
+                queueList.Add(queueProp.Name);
+            }
+
+            await foreach (var topicProp in topics)
+            {
+                topicList.Add(topicProp.Name);
+            }
+
             _globalSettings.ServiceBusConnectionString = request.ConnectionString;
-            return Ok();
+            return Ok( new
+            {
+                queues = queueList,
+                topics = topicList
+            });
         }
 
         [HttpGet]
@@ -39,5 +67,6 @@ namespace MessageReplay.Api.Features.Settings
                 ConnectionString = _globalSettings.ServiceBusConnectionString
             });
         }
+     
     }
 }

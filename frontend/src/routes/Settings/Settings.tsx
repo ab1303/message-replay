@@ -1,5 +1,6 @@
 import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
+import { DevTool } from '@hookform/devtools';
 import {
   FormErrorMessage,
   FormLabel,
@@ -11,10 +12,13 @@ import {
   Stack,
   Spinner,
 } from '@chakra-ui/core';
-import { SettingsFormData } from './types';
+import { SettingsEvent, SettingsFormData } from './types';
 import { useSettingsMutation } from './useSettingsMutation';
+import { useAppDispatch, useAppState } from 'src/providers/AppStateProvider';
 
 const Settings: React.FC = () => {
+  const appState = useAppState();
+  const appDispatch = useAppDispatch();
   const formMethods = useForm<SettingsFormData>({
     mode: 'onBlur',
     defaultValues: {
@@ -22,14 +26,39 @@ const Settings: React.FC = () => {
     },
   });
 
+  const {
+    handleSubmit,
+    errors,
+    register,
+    formState,
+    control,
+    reset,
+  } = formMethods;
   const settingsMutation = useSettingsMutation();
-
   const submitHandler = (formData: SettingsFormData) => {
     console.log('User Recipient Form Data:', JSON.stringify(formData, null, 2));
-    settingsMutation.mutate(formData);
-  };
 
-  const { handleSubmit, errors, register, formState } = formMethods;
+    appDispatch({
+      payload: {},
+      type: SettingsEvent.CONNECTION_CHANGE,
+    });
+
+    settingsMutation.mutate(formData, {
+      onSuccess: result => {
+        reset({
+          connectionString: formData.connectionString,
+        });
+        appDispatch({
+          payload: {
+            connectionString: formData.connectionString,
+            queues: result.data.queues,
+            topics: result.data.topics,
+          },
+          type: SettingsEvent.CONNECTION_CHANGED,
+        });
+      },
+    });
+  };
 
   return (
     <Box w={800} p={4} m="20px auto">
@@ -37,6 +66,7 @@ const Settings: React.FC = () => {
         Service Bus Settings
       </Heading>
 
+      <DevTool control={control} />
       <FormProvider {...formMethods}>
         <form onSubmit={handleSubmit(submitHandler)}>
           <Box
@@ -46,7 +76,7 @@ const Settings: React.FC = () => {
             rounded="lg"
             shadow="1px 1px 3px rgba(0,0,0,0.3)"
           >
-            {settingsMutation.isLoading ? (
+            {appState.isLoading ? (
               <Spinner thickness="4px" size="md" color="teal.500" />
             ) : (
               <Stack margin="auto" spacing={5}>
