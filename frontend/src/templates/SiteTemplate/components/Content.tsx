@@ -6,6 +6,8 @@ import { Path, routeTo } from 'src/router';
 import Home from 'src/routes/Home';
 import Settings from 'src/routes/Settings';
 import Users from 'src/routes/Users';
+import { useAppState } from 'src/providers/AppStateProvider';
+import SubscriptionList from 'src/routes/Topics/SubscriptionList';
 
 const Content: React.FC = () => {
   const { colorMode } = useColorMode();
@@ -13,6 +15,11 @@ const Content: React.FC = () => {
   const bg = useMemo(() => (colorMode === 'dark' ? 'gray.600' : 'gray.50'), [
     colorMode,
   ]);
+
+  const appState = useAppState();
+  const {
+    entity: { queues, topics },
+  } = appState;
 
   return (
     <Box ml={[0, null, '18rem']} mt="4rem" height="full" bg={bg}>
@@ -29,6 +36,17 @@ const Content: React.FC = () => {
           <Route exact path="/">
             <Redirect to={routeTo(Path.Settings)} />
           </Route>
+          {!!topics.length &&
+            topics.map(topic => {
+              return (
+                <Route
+                  key={topic}
+                  exact
+                  path={`${Path.MESSAGE_BROKER_TOPICS}/:topic`}
+                  component={SubscriptionList}
+                />
+              );
+            })}
         </Switch>
       </Box>
     </Box>

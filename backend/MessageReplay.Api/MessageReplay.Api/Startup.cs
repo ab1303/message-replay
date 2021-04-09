@@ -1,4 +1,3 @@
-using MessageReplay.Api.Features.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -53,7 +52,6 @@ namespace MessageReplay.Api
             });
 
             // DI 
-            services.AddSingleton<IGlobalSettings, GlobalSettings>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

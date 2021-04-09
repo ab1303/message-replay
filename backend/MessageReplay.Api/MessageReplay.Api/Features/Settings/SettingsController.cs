@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus.Administration;
+using MessageReplay.Api.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -11,31 +12,30 @@ namespace MessageReplay.Api.Features.Settings
     [Produces("application/json")]
     [Route("api/[controller]")]
 
+    // TODO: Change from Settings -> Connection
     public class SettingsController : ControllerBase
     {
-        private readonly IGlobalSettings _globalSettings;
         private readonly ILogger<SettingsController> _logger;
-
-
-        public int ServerTimeout { get; set; } = 5;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="globalSettings"></param>
         /// <param name="logger"></param>
-        public SettingsController(IGlobalSettings globalSettings, ILogger<SettingsController> logger)
+        public SettingsController(ILogger<SettingsController> logger)
         {
-            _globalSettings = globalSettings;
             _logger = logger;
         }
 
         [HttpPost]
         public async Task<IActionResult> SaveAppSettings(SaveAppSettingsRequest request)
         {
+            ServiceBusAdministrationClientSingleton.Instance
+                .WithConnection(request.ConnectionString);
+
+
             var queueList = new List<string>();
             var topicList = new List<string>();
-            var adminClient = new ServiceBusAdministrationClient(request.ConnectionString);
+            var adminClient = ServiceBusAdministrationClientSingleton.Instance.Client;
 
             var queues = adminClient.GetQueuesAsync();
             var topics = adminClient.GetTopicsAsync();
@@ -51,7 +51,6 @@ namespace MessageReplay.Api.Features.Settings
                 topicList.Add(topicProp.Name);
             }
 
-            _globalSettings.ServiceBusConnectionString = request.ConnectionString;
             return Ok( new
             {
                 queues = queueList,
@@ -64,7 +63,7 @@ namespace MessageReplay.Api.Features.Settings
         {
             return Ok(new FetchAppSettingsResponse
             {
-                ConnectionString = _globalSettings.ServiceBusConnectionString
+                ConnectionString = ServiceBusAdministrationClientSingleton.Instance.ConnectionString
             });
         }
      

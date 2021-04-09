@@ -43,11 +43,14 @@ const SideNavContent: React.FC<Props> = ({ mode, ...props }) => {
               mode={mode}
               label="Topics"
             >
-              {topics.map(item => (
-                <SideNavItem key={item} to={item} mode={mode}>
-                  {item}
-                </SideNavItem>
-              ))}
+              {topics.map(item => {
+                const topicPath = `${Path.MESSAGE_BROKER_TOPICS}/${item}`;
+                return (
+                  <SideNavItem key={item} to={routeTo(topicPath)} mode={mode}>
+                    {item}
+                  </SideNavItem>
+                );
+              })}
             </SideNavMenu>
           )}
         </SideNavMenu>

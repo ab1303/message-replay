@@ -4,11 +4,16 @@
         <name>MessageReplay.Api</name>
     </assembly>
     <members>
-        <member name="M:MessageReplay.Api.Features.Settings.SettingsController.#ctor(MessageReplay.Api.Features.Settings.IGlobalSettings,Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Settings.SettingsController})">
+        <member name="M:MessageReplay.Api.Features.Settings.SettingsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Settings.SettingsController})">
             <summary>
             
             </summary>
-            <param name="globalSettings"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:MessageReplay.Api.Features.Settings.TopicsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Settings.TopicsController})">
+            <summary>
+            
+            </summary>
             <param name="logger"></param>
         </member>
     </members>
