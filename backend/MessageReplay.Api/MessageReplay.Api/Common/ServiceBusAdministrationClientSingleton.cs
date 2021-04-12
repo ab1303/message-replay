@@ -20,12 +20,18 @@ namespace MessageReplay.Api.Common
         public string ConnectionString { get => _serviceBusConnectionString; }
         public ServiceBusAdministrationClient Client { get => _serviceBusAdminClient; }
         
-        public void WithConnection(string connectionString)
+        public ServiceBusAdministrationClientSingleton WithConnection(string connectionString)
         {
-            _serviceBusAdminClient = new ServiceBusAdministrationClient(connectionString);
             _serviceBusConnectionString = connectionString;
+            return this;
         }
-     
+
+        public ServiceBusAdministrationClient BuildClient()
+        {
+            _serviceBusAdminClient = new ServiceBusAdministrationClient(_serviceBusConnectionString);
+            return _serviceBusAdminClient;
+        }
+
         private ServiceBusAdministrationClientSingleton()
         {
 

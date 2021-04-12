@@ -1,3 +1,5 @@
+using MessageReplay.Api.Common.Infrastructure;
+using MessageReplay.Api.Features.Subscriptions.Queries;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -6,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -52,6 +55,10 @@ namespace MessageReplay.Api
             });
 
             // DI 
+
+            services
+                .AddScoped<IQueryHandlerAsync<GetSubscriptionMessagesQuery, (IEnumerable<GetSubscriptionMessageDto>, int)>, GetSubscriptionMessagesQueryHandler>()
+                ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

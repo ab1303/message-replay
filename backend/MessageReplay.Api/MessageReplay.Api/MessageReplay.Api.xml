@@ -4,13 +4,46 @@
         <name>MessageReplay.Api</name>
     </assembly>
     <members>
+        <member name="M:MessageReplay.Api.Common.Helpers.ServiceBusPurger.Purge(System.Boolean)">
+            <summary>
+            Purges the messages from a queue, subscription or a dead letter queue. Handles all kinds of queues.
+            </summary>
+            <param name="purgeDeadLetterQueueInstead">If false it will purge the queue, if true it will purge the 
+            dead letter queue instead.</param>
+            <returns>The number of messages purged</returns>
+        </member>
+        <member name="P:MessageReplay.Api.Common.Infrastructure.QueryDefaults.PageNumber">
+            <summary>
+            Current page number
+            </summary>
+        </member>
+        <member name="P:MessageReplay.Api.Common.Infrastructure.QueryDefaults.PageSize">
+            <summary>
+            Number of items on page
+            </summary>
+        </member>
+        <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Subscriptions.SubscriptionsController},MessageReplay.Api.Common.Infrastructure.IQueryHandlerAsync{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionMessagesQuery,System.ValueTuple{System.Collections.Generic.IEnumerable{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionMessageDto},System.Int32}})">
+            <summary>
+            
+            </summary>
+            <param name="logger"></param>
+            <param name="subscriptionMessagesQueryHandler"></param>
+        </member>
+        <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.GetSubscriptionMessages(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="topicName"></param>
+            <param name="subscriptionName"></param>
+            <returns></returns>
+        </member>
         <member name="M:MessageReplay.Api.Features.Settings.SettingsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Settings.SettingsController})">
             <summary>
             
             </summary>
             <param name="logger"></param>
         </member>
-        <member name="M:MessageReplay.Api.Features.Settings.TopicsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Settings.TopicsController})">
+        <member name="M:MessageReplay.Api.Features.Topics.TopicsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Topics.TopicsController})">
             <summary>
             
             </summary>

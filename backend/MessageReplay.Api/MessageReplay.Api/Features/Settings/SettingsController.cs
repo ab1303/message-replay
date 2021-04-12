@@ -30,8 +30,14 @@ namespace MessageReplay.Api.Features.Settings
         public async Task<IActionResult> SaveAppSettings(SaveAppSettingsRequest request)
         {
             ServiceBusAdministrationClientSingleton.Instance
-                .WithConnection(request.ConnectionString);
+                .WithConnection(request.ConnectionString)
+                .BuildClient()
+                ;
 
+            ServiceBusClientSingleton.Instance
+                .WithConnection(request.ConnectionString)
+                .BuildClient()
+                ;
 
             var queueList = new List<string>();
             var topicList = new List<string>();
@@ -51,7 +57,7 @@ namespace MessageReplay.Api.Features.Settings
                 topicList.Add(topicProp.Name);
             }
 
-            return Ok( new
+            return Ok(new
             {
                 queues = queueList,
                 topics = topicList
@@ -66,6 +72,6 @@ namespace MessageReplay.Api.Features.Settings
                 ConnectionString = ServiceBusAdministrationClientSingleton.Instance.ConnectionString
             });
         }
-     
+
     }
 }

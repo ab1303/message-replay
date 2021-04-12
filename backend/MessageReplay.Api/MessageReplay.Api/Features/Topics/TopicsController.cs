@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MessageReplay.Api.Features.Settings
+namespace MessageReplay.Api.Features.Topics
 {
 
     [ApiController]
