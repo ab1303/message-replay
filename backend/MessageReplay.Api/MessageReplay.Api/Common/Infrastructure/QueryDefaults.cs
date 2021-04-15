@@ -7,6 +7,8 @@ namespace MessageReplay.Api.Common.Infrastructure
 {
     public class QueryDefaults
     {
+
+        public static TimeSpan MaxWaitTime = new TimeSpan(0, 0, 5);
         public const int MaxPageSize = 25;
         public const int DefaultPageNumber = 1;
         public const int DefaultPageSize = 10;

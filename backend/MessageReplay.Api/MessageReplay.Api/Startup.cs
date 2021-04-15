@@ -29,6 +29,8 @@ namespace MessageReplay.Api
         {
             services.AddLogging(x => x.AddConsole());
 
+            services.AddAutoMapper(typeof(Startup));
+
             services.AddControllers()
                  .AddJsonOptions(options =>
                  {
@@ -55,9 +57,9 @@ namespace MessageReplay.Api
             });
 
             // DI 
-
             services
-                .AddScoped<IQueryHandlerAsync<GetSubscriptionMessagesQuery, (IEnumerable<GetSubscriptionMessageDto>, int)>, GetSubscriptionMessagesQueryHandler>()
+                .AddScoped<IQueryHandlerAsync<GetSubscriptionMessagesQuery, IEnumerable<GetSubscriptionMessageDto>>, GetSubscriptionMessagesQueryHandler>()
+                .AddScoped<IQueryHandlerAsync<GetSubscriptionDeadLettersQuery, IEnumerable<GetSubscriptionDeadLetterDto>>, GetSubscriptionDeadLettersQueryHandler>()
                 ;
         }
 

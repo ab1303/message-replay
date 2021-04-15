@@ -1,4 +1,5 @@
-﻿using Azure.Messaging.ServiceBus;
+﻿using AutoMapper;
+using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
 using MessageReplay.Api.Common;
 using MessageReplay.Api.Common.Infrastructure;
@@ -19,19 +20,28 @@ namespace MessageReplay.Api.Features.Subscriptions
     public class SubscriptionsController : ControllerBase
     {
         private readonly ILogger<SubscriptionsController> _logger;
-        private readonly IQueryHandlerAsync<GetSubscriptionMessagesQuery, (IEnumerable<GetSubscriptionMessageDto>, int)> _subscriptionMessagesQueryHandler;
+        private readonly IMapper _mapper;
+        private readonly IQueryHandlerAsync<GetSubscriptionMessagesQuery, IEnumerable<GetSubscriptionMessageDto>> _subscriptionMessagesQueryHandler;
+        private readonly IQueryHandlerAsync<GetSubscriptionDeadLettersQuery, IEnumerable<GetSubscriptionDeadLetterDto>> _subscriptionDeadLettersQueryHandler;
         private readonly ServiceBusClient _client;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="mapper"></param>
         /// <param name="subscriptionMessagesQueryHandler"></param>
+        /// <param name="subscriptionDeadLettersQueryHandler"></param>
         public SubscriptionsController(ILogger<SubscriptionsController> logger,
-            IQueryHandlerAsync<GetSubscriptionMessagesQuery, (IEnumerable<GetSubscriptionMessageDto>, int)> subscriptionMessagesQueryHandler)
+            IMapper mapper,
+            IQueryHandlerAsync<GetSubscriptionMessagesQuery, IEnumerable<GetSubscriptionMessageDto>> subscriptionMessagesQueryHandler,
+            IQueryHandlerAsync<GetSubscriptionDeadLettersQuery, IEnumerable<GetSubscriptionDeadLetterDto>> subscriptionDeadLettersQueryHandler
+            )
         {
             _logger = logger;
+            _mapper = mapper;
             _subscriptionMessagesQueryHandler = subscriptionMessagesQueryHandler;
+            _subscriptionDeadLettersQueryHandler = subscriptionDeadLettersQueryHandler;
             _client = ServiceBusClientSingleton.Instance.Client;
         }
 
@@ -46,15 +56,12 @@ namespace MessageReplay.Api.Features.Subscriptions
 
         public async Task<IActionResult> GetSubscriptionMessages(string topicName, string subscriptionName)
         {
-            var messagesList = new List<GetSubscriptionMessage>();
-
             var query = new GetSubscriptionMessagesQuery(topicName, subscriptionName);
-
-            var queryResult = await _subscriptionMessagesQueryHandler.GetResultAsync(query);
+            var messages = await _subscriptionMessagesQueryHandler.GetResultAsync(query);
 
             return Ok(new GetSubscriptionMessagesResponse
             {
-                Messages = messagesList
+                Messages = _mapper.Map<List<GetSubscriptionMessage>>(messages),
             });
         }
 
@@ -62,22 +69,12 @@ namespace MessageReplay.Api.Features.Subscriptions
 
         public async Task<IActionResult> GetSubscriptionDeadLetters(string topicName, string subscriptionName)
         {
-            var deadLettersList = new List<GetSubscriptionDeadLetter>();
-            //var subscriptions = _client.GetSubscriptionsAsync(subscriptionName);
-
-            //await foreach (var subscriptionProp in subscriptions)
-            //{
-            //    deadLettersList.Add(new GetSubscriptionDeadLetter
-            //    {
-            //        Name = subscriptionProp.SubscriptionName,
-            //        MaxDeliveryCount = subscriptionProp.MaxDeliveryCount,
-            //        Status = subscriptionProp.Status
-            //    });
-            //}
+            var query = new GetSubscriptionDeadLettersQuery(topicName, subscriptionName);
+            var deadLetters = await _subscriptionDeadLettersQueryHandler.GetResultAsync(query);
 
             return Ok(new GetSubscriptionDeadLettersResponse
             {
-                DeadLetters = deadLettersList
+                DeadLetters = _mapper.Map<List<GetSubscriptionDeadLetter>>(deadLetters)
             });
         }
 

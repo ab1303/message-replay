@@ -22,12 +22,14 @@
             Number of items on page
             </summary>
         </member>
-        <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Subscriptions.SubscriptionsController},MessageReplay.Api.Common.Infrastructure.IQueryHandlerAsync{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionMessagesQuery,System.ValueTuple{System.Collections.Generic.IEnumerable{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionMessageDto},System.Int32}})">
+        <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Subscriptions.SubscriptionsController},AutoMapper.IMapper,MessageReplay.Api.Common.Infrastructure.IQueryHandlerAsync{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionMessagesQuery,System.Collections.Generic.IEnumerable{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionMessageDto}},MessageReplay.Api.Common.Infrastructure.IQueryHandlerAsync{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionDeadLettersQuery,System.Collections.Generic.IEnumerable{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionDeadLetterDto}})">
             <summary>
             
             </summary>
             <param name="logger"></param>
+            <param name="mapper"></param>
             <param name="subscriptionMessagesQueryHandler"></param>
+            <param name="subscriptionDeadLettersQueryHandler"></param>
         </member>
         <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.GetSubscriptionMessages(System.String,System.String)">
             <summary>

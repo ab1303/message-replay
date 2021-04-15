@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace MessageReplay.Api.Features.Subscriptions.Queries
 {
 
-    public class GetSubscriptionMessagesQuery
+    public class GetSubscriptionDeadLettersQuery
     {
         public Query BaseQuery { get; }
         public string TopicName { get; }
         public string SubscriptionName { get; }
 
-        public GetSubscriptionMessagesQuery(string topicName, string subscriptionName, (int pageNumber, int size)? pagination = null)
+        public GetSubscriptionDeadLettersQuery(string topicName, string subscriptionName, (int pageNumber, int size)? pagination = null)
         {
             BaseQuery = pagination == null
                 ? new QueryBuilder()
@@ -28,7 +28,7 @@ namespace MessageReplay.Api.Features.Subscriptions.Queries
         }
     }
 
-    public class GetSubscriptionMessageDto
+    public class GetSubscriptionDeadLetterDto
     {
         public string MessageId { get; set; }
         public string Subject { get; set; }
@@ -38,36 +38,42 @@ namespace MessageReplay.Api.Features.Subscriptions.Queries
     }
 
 
-    public class GetSubscriptionMessagesQueryHandler : IQueryHandlerAsync<GetSubscriptionMessagesQuery, IEnumerable<GetSubscriptionMessageDto>>
+    public class GetSubscriptionDeadLettersQueryHandler : IQueryHandlerAsync<GetSubscriptionDeadLettersQuery, IEnumerable<GetSubscriptionDeadLetterDto>>
     {
         private ServiceBusClient _serviceBusClient;
-        public GetSubscriptionMessagesQueryHandler()
+        public GetSubscriptionDeadLettersQueryHandler()
         {
             _serviceBusClient = ServiceBusClientSingleton.Instance.Client;
         }
 
-        public async Task<IEnumerable<GetSubscriptionMessageDto>> GetResultAsync(GetSubscriptionMessagesQuery query)
+        public async Task<IEnumerable<GetSubscriptionDeadLetterDto>> GetResultAsync(GetSubscriptionDeadLettersQuery query)
         {
 
-            var messagesList = new List<GetSubscriptionMessageDto>();
+            var deadLetters = new List<GetSubscriptionDeadLetterDto>();
 
-            var receiver = _serviceBusClient.CreateReceiver(query.TopicName, query.SubscriptionName);
+            var receiver = _serviceBusClient.CreateReceiver(query.TopicName, query.SubscriptionName,
+                new ServiceBusReceiverOptions
+                {
+                    SubQueue = SubQueue.DeadLetter,
+                    ReceiveMode = ServiceBusReceiveMode.PeekLock,
+                });
+
             var messages = await receiver.ReceiveMessagesAsync(QueryDefaults.MaxPageSize, QueryDefaults.MaxWaitTime);
 
-            
+
             foreach (var message in messages)
             {
-                messagesList.Add(new GetSubscriptionMessageDto
+                deadLetters.Add(new GetSubscriptionDeadLetterDto
                 {
                     MessageId = message.MessageId,
                     Subject = message.Subject,
-                    SequenceNumber = message.SequenceNumber,                    
+                    SequenceNumber = message.SequenceNumber,
                     EnqueuedTime = message.EnqueuedTime,
                     ExpiresAt = message.ExpiresAt,
                 });
             }
 
-            return messagesList;
+            return deadLetters;
         }
     }
 }
