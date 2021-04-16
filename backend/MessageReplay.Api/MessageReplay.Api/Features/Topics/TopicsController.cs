@@ -41,7 +41,7 @@ namespace MessageReplay.Api.Features.Topics
                 subscriptionsList.Add(new GetTopicSubscription { 
                     Name = subscriptionProp.SubscriptionName,
                     MaxDeliveryCount = subscriptionProp.MaxDeliveryCount,
-                    Status = subscriptionProp.Status
+                    Status = subscriptionProp.Status                    
                 });
             }
 

@@ -1,17 +1,13 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 import { Card, Table } from 'src/components';
+import { Path } from 'src/router';
 import { useSubscriptionsQuery } from './useSubscriptionsQuery';
 
 const SubscriptionList: React.FC = () => {
   const { topic } = useParams<{ topic: string }>();
-
-  const { data, isLoading } = useSubscriptionsQuery();
-
-  if (!isLoading) {
-    console.log('data from response', data);
-  }
+  const { data, isFetched } = useSubscriptionsQuery(topic);
 
   return (
     <Card>
@@ -27,14 +23,21 @@ const SubscriptionList: React.FC = () => {
           </Table.THead.TR>
         </Table.THead>
 
-        {!isLoading && !!data && (
+        {isFetched && !!data && data.subscriptions && (
           <Table.TBody>
-            {data.subscriptions.map(subscription => (
-              <Table.TBody.TR key={subscription.name}>
-                <Table.TBody.TD>{subscription.name}</Table.TBody.TD>
-                <Table.TBody.TD>{subscription.maxDeliveryCount}</Table.TBody.TD>
-              </Table.TBody.TR>
-            ))}
+            {data.subscriptions.map(subscription => {
+              const subscriptionPath = `${Path.MESSAGE_BROKER_TOPICS}/${topic}/subscriptions/${subscription.name}/messages`;
+              return (
+                <Table.TBody.TR key={subscription.name}>
+                  <Table.TBody.TD>
+                    <Link to={subscriptionPath}>{subscription.name}</Link>
+                  </Table.TBody.TD>
+                  <Table.TBody.TD>
+                    {subscription.maxDeliveryCount}
+                  </Table.TBody.TD>
+                </Table.TBody.TR>
+              );
+            })}
           </Table.TBody>
         )}
       </Table>

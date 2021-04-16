@@ -6,7 +6,7 @@ export const cell = ({ theme }: any) => css`
   vertical-align: middle;
   padding: ${theme.space[2]}};
 
-  &:first-child {
+  &:first-of-type {
     padding-left: ${theme.space[4]}};
   }
   &:last-child {
