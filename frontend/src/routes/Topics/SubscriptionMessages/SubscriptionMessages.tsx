@@ -1,20 +1,15 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { Card, Table } from 'src/components';
-import { Path } from 'src/router';
 import { useSubscriptionMessagesQuery } from './useSubscriptionMessagesQuery';
 
-const SubscriptionList: React.FC = () => {
+const SubscriptionMessages: React.FC = () => {
   const { topic, subscription } = useParams<{
     topic: string;
     subscription: string;
   }>();
   const { data, isFetched } = useSubscriptionMessagesQuery(topic, subscription);
-  if (isFetched) {
-    console.log('subscription messages:', data);
-  }
-
   return (
     <Card>
       <Card.Header>
@@ -46,4 +41,4 @@ const SubscriptionList: React.FC = () => {
   );
 };
 
-export default SubscriptionList;
+export default SubscriptionMessages;

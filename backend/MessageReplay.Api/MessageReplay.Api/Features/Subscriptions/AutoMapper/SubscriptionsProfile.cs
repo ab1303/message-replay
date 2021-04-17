@@ -13,6 +13,7 @@ namespace MessageReplay.Api.Features.Subscriptions.AutoMapper
         public SubscriptionsProfile()
         {
             CreateMap<GetSubscriptionMessageDto, GetSubscriptionMessage>();
+            CreateMap<GetSubscriptionDeadLetterDto, GetSubscriptionDeadLetter>();
         }
     }
 }

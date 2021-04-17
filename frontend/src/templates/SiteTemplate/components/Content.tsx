@@ -8,7 +8,7 @@ import Settings from 'src/routes/Settings';
 import Users from 'src/routes/Users';
 import SubscriptionList from 'src/routes/Topics/SubscriptionList';
 import DefaultRoute from 'src/router/DefaultRoute';
-import SubscriptionMessages from 'src/routes/Topics/SubscriptionMessages';
+import Subscription from 'src/routes/Topics/Subscription';
 
 const Content: React.FC = () => {
   const { colorMode } = useColorMode();
@@ -39,14 +39,10 @@ const Content: React.FC = () => {
             component={SubscriptionList}
           />
           <DefaultRoute
-            exact
-            path={`${Path.MESSAGE_BROKER_TOPICS}/:topic/subscriptions/:subscription/messages`}
-            component={SubscriptionMessages}
+            path={`${Path.MESSAGE_BROKER_TOPICS}/:topic/subscriptions/:subscription`}
+            component={Subscription}
           />
           <Route exact path="/">
-            <Redirect to={routeTo(Path.Settings)} />
-          </Route>
-          <Route exact path="*">
             <Redirect to={routeTo(Path.Settings)} />
           </Route>
         </Switch>

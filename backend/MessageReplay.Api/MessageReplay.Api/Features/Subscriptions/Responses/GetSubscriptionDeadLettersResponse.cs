@@ -1,13 +1,16 @@
 ﻿using Azure.Messaging.ServiceBus.Administration;
+using System;
 using System.Collections.Generic;
 
 namespace MessageReplay.Api.Features.Topics.Responses
 {
     public class GetSubscriptionDeadLetter
     {
-        public string Name { get; set; }
-        public EntityStatus Status { get; set; }
-        public int MaxDeliveryCount { get; set; }
+        public string MessageId { get; set; }
+        public string Subject { get; set; }
+        public long SequenceNumber { get; set; }
+        public DateTimeOffset EnqueuedTime { get; set; }
+        public DateTimeOffset ExpiresAt { get; set; }
     }
 
     public class GetSubscriptionDeadLettersResponse
