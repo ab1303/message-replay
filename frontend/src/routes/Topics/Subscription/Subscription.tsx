@@ -13,16 +13,22 @@ const SubscriptionList: React.FC = () => {
   return (
     <Tabs>
       <TabList>
-        <Tab>Messages</Tab>
-        <Tab>Dead Letters</Tab>
+        <Tab>
+          <Link to={`${match.url}/messages`}>Messages</Link>
+        </Tab>
+        <Tab>
+          <Link to={`${match.url}/deadletters`}>Dead Letters</Link>
+        </Tab>
       </TabList>
       <TabPanels>
-        <TabPanel>
-          <SubscriptionMessages />
-        </TabPanel>
-        <TabPanel>
-          <SubscriptionDeadLetters />
-        </TabPanel>
+        <Switch>
+          <Route path={`${match.path}/messages`}>
+            <SubscriptionMessages />
+          </Route>
+          <Route path={`${match.path}/deadletters`}>
+            <SubscriptionDeadLetters />
+          </Route>
+        </Switch>
       </TabPanels>
     </Tabs>
   );
