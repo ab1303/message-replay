@@ -6,7 +6,7 @@ import { cell } from '../../modules/styles';
 
 const Wrapper = styled('td')`
   ${cell};
-  font-size: ${({ theme }: any) => theme.fontSizes.md};
+  font-size: ${({ theme }: any) => theme.fontSizes.sm};
   padding-top: ${({ theme }: any) => theme.space[3]}};
   padding-bottom: ${({ theme }: any) => theme.space[3]}};
   border-top-width: 1px;

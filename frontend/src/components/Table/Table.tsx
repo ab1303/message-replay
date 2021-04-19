@@ -5,6 +5,8 @@ import TBody from './components/TBody';
 import THead from './components/THead';
 
 const Wrapper = styled('table')`
+  borderspacing: 0;
+  border: '1px solid rgba(224, 224, 224, 1)';
   width: 100%;
   max-width: 100%;
 `;
