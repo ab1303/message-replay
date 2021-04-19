@@ -1,4 +1,4 @@
-type SubscriptionDeadLettersQueryResponse = {
+export type SubscriptionDeadLettersQueryResponse = {
   messageId: string;
   subject: string;
   sequenceNumber: number;
