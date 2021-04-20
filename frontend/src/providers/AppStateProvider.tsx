@@ -5,7 +5,9 @@ import { Actions, AppState } from 'src/types';
 const initialAppState: AppState = {
   isLoading: false,
   settings: {
-    connectionString: '',
+    // connectionString: '',
+    connectionString:
+      'Endpoint=sb://replay-infinitum.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=hUpRvIHz6uJSMzyLI0/4PpQ/oSa+CI9v65CQ/IdwZSA=',
   },
   entity: {
     queues: [],
