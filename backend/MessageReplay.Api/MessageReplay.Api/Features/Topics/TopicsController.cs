@@ -1,7 +1,7 @@
-﻿using Azure.Messaging.ServiceBus.Administration;
-using MessageReplay.Api.Common;
+﻿using MessageReplay.Api.Common;
 using MessageReplay.Api.Features.Topics.Responses;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.ServiceBus.Management;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace MessageReplay.Api.Features.Topics
     public class TopicsController : ControllerBase
     {
         private readonly ILogger<TopicsController> _logger;
-        private readonly ServiceBusAdministrationClient _client;
+        private readonly ManagementClient _client;
 
         /// <summary>
         /// 
@@ -25,7 +25,7 @@ namespace MessageReplay.Api.Features.Topics
         public TopicsController(ILogger<TopicsController> logger)
         {
             _logger = logger;
-            _client = ServiceBusAdministrationClientSingleton.Instance.Client;
+            _client = ServiceBusManagementClientSingleton.Instance.Client;
         }
 
 
@@ -34,14 +34,15 @@ namespace MessageReplay.Api.Features.Topics
         public async Task<IActionResult> GetTopicSubscriptions(string topicName)
         {
             var subscriptionsList = new List<GetTopicSubscription>();
-            var subscriptions = _client.GetSubscriptionsAsync(topicName);
+            var subscriptions = await _client.GetSubscriptionsRuntimeInfoAsync(topicName);
 
-            await foreach (var subscriptionProp in subscriptions)
+            foreach (var subscriptionProp in subscriptions)
             {
                 subscriptionsList.Add(new GetTopicSubscription { 
                     Name = subscriptionProp.SubscriptionName,
-                    MaxDeliveryCount = subscriptionProp.MaxDeliveryCount,
-                    Status = subscriptionProp.Status                    
+                    ActiveMessageCount = subscriptionProp.MessageCountDetails.ActiveMessageCount,
+                    DeadLetterMessageCount = subscriptionProp.MessageCountDetails.DeadLetterMessageCount,
+                    CreatedAt = subscriptionProp.CreatedAt
                 });
             }
 

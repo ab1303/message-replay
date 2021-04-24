@@ -10,33 +10,13 @@ import {
   useTable,
 } from 'react-table';
 
-import { Card, Table } from 'src/components';
-import {
-  HeaderCheckbox,
-  RowCheckbox,
-} from 'src/components/Table/components/TableStyles';
+import dateformat from 'dateformat';
+
+import { Card, Table, IndeterminateCheckbox } from 'src/components';
+
 import { SubscriptionDeadLettersQueryResponse } from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
-
-const IndeterminateCheckbox = React.forwardRef<HTMLInputElement>(
-  // @ts-ignore
-  ({ indeterminate, ...rest }, ref) => {
-    const defaultRef = React.useRef<HTMLInputElement>(null);
-    const resolvedRef = ref || defaultRef;
-
-    React.useEffect(() => {
-      // @ts-ignore
-      resolvedRef.current.indeterminate = indeterminate;
-    }, [resolvedRef, indeterminate]);
-
-    return (
-      <>
-        {/* @ts-ignore */}
-        <input type="checkbox" ref={resolvedRef} {...rest} />
-      </>
-    );
-  },
-);
+import { DATE_FORMAT } from 'src/constants';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -93,6 +73,10 @@ const SubscriptionDeadLetters: React.FC = () => {
       {
         Header: 'Expires At',
         accessor: 'expiresAt',
+        Cell: ({ row }: CellProps<any>) => {
+          console.log('row props', row);
+          return dateformat(row.values['expiresAt'], DATE_FORMAT);
+        },
       },
     ],
     [],

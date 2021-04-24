@@ -1,6 +1,8 @@
 export type SubscriptionsQueryResponse = {
   name: string;
-  maxDeliveryCount: number;
+  activeMessageCount: number;
+  deadLetterMessageCount: number;
+  createdAt: string;
 };
 
 export type SubscriptionsQueryResponsePayload = {

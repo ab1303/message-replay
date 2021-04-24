@@ -6,7 +6,6 @@ import { cell } from '../../modules/styles';
 
 const Wrapper = styled('th')`
   ${cell};
-  text-transform: uppercase;
   font-size: ${({ theme }: any) => theme.fontSizes.md};
   color: ${({ theme }: any) => theme.colors.gray[500]};
 `;

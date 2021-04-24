@@ -1,9 +1,11 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import dateformat from 'dateformat';
 
 import { Card, Table } from 'src/components';
 import { Path } from 'src/router';
 import { useSubscriptionsQuery } from './useSubscriptionsQuery';
+import { DATE_FORMAT } from 'src/constants';
 
 const SubscriptionList: React.FC = () => {
   const { topic } = useParams<{ topic: string }>();
@@ -19,7 +21,9 @@ const SubscriptionList: React.FC = () => {
         <Table.THead>
           <Table.THead.TR>
             <Table.THead.TH>Name</Table.THead.TH>
-            <Table.THead.TH>Max Delivery Count</Table.THead.TH>
+            <Table.THead.TH>Active Messages</Table.THead.TH>
+            <Table.THead.TH>DeadLetters</Table.THead.TH>
+            <Table.THead.TH>Created At</Table.THead.TH>
           </Table.THead.TR>
         </Table.THead>
 
@@ -33,7 +37,13 @@ const SubscriptionList: React.FC = () => {
                     <Link to={subscriptionPath}>{subscription.name}</Link>
                   </Table.TBody.TD>
                   <Table.TBody.TD>
-                    {subscription.maxDeliveryCount}
+                    {subscription.activeMessageCount}
+                  </Table.TBody.TD>
+                  <Table.TBody.TD>
+                    {subscription.deadLetterMessageCount}
+                  </Table.TBody.TD>
+                  <Table.TBody.TD>
+                    {dateformat(subscription.createdAt, DATE_FORMAT)}
                   </Table.TBody.TD>
                 </Table.TBody.TR>
               );

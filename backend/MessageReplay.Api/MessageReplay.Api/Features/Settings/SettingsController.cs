@@ -39,6 +39,11 @@ namespace MessageReplay.Api.Features.Settings
                 .BuildClient()
                 ;
 
+            ServiceBusManagementClientSingleton.Instance
+             .WithConnection(request.ConnectionString)
+             .BuildClient()
+             ;
+
             var queueList = new List<string>();
             var topicList = new List<string>();
             var adminClient = ServiceBusAdministrationClientSingleton.Instance.Client;
