@@ -1,9 +1,9 @@
-﻿using Azure.Messaging.ServiceBus.Administration;
-using MessageReplay.Api.Common;
+﻿using MessageReplay.Api.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+using MessageReplay.Api.Helpers;
 using System.Threading.Tasks;
+using MessageReplay.Api.Models;
 
 namespace MessageReplay.Api.Features.Settings
 {
@@ -16,24 +16,26 @@ namespace MessageReplay.Api.Features.Settings
     public class SettingsController : ControllerBase
     {
         private readonly ILogger<SettingsController> _logger;
+        private readonly IQueueHelper _queueHelper;
+        private readonly ITopicHelper _topicHelper;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="logger"></param>
-        public SettingsController(ILogger<SettingsController> logger)
+        /// <param name="queueHelper"></param>
+        /// <param name="topicHelper"></param>
+        public SettingsController(ILogger<SettingsController> logger, IQueueHelper queueHelper, ITopicHelper topicHelper)
         {
             _logger = logger;
+            _queueHelper = queueHelper;
+            _topicHelper = topicHelper;
         }
 
         [HttpPost]
         public async Task<IActionResult> SaveAppSettings(SaveAppSettingsRequest request)
-        {
-            ServiceBusAdministrationClientSingleton.Instance
-                .WithConnection(request.ConnectionString)
-                .BuildClient()
-                ;
-
+        {   
+            // TODO: Change to ServiceBusResourceSingleton
             ServiceBusClientSingleton.Instance
                 .WithConnection(request.ConnectionString)
                 .BuildClient()
@@ -44,28 +46,16 @@ namespace MessageReplay.Api.Features.Settings
              .BuildClient()
              ;
 
-            var queueList = new List<string>();
-            var topicList = new List<string>();
-            var adminClient = ServiceBusAdministrationClientSingleton.Instance.Client;
+            var namespaceInfo = await _topicHelper.GetNamespaceInfoAsync(request.ConnectionString);
+            var queues = await _queueHelper.GetQueuesAsync(request.ConnectionString);
+            var topics = await _topicHelper.GetTopicsAsync(request.ConnectionString);
 
-            var queues = adminClient.GetQueuesAsync();
-            var topics = adminClient.GetTopicsAsync();
-
-
-            await foreach (var queueProp in queues)
+            return Ok(new ServiceBusResource
             {
-                queueList.Add(queueProp.Name);
-            }
-
-            await foreach (var topicProp in topics)
-            {
-                topicList.Add(topicProp.Name);
-            }
-
-            return Ok(new
-            {
-                queues = queueList,
-                topics = topicList
+                Name = namespaceInfo.Name,
+                ConnectionString = request.ConnectionString,
+                Queues = queues,
+                Topics = topics,
             });
         }
 
@@ -74,7 +64,7 @@ namespace MessageReplay.Api.Features.Settings
         {
             return Ok(new FetchAppSettingsResponse
             {
-                ConnectionString = ServiceBusAdministrationClientSingleton.Instance.ConnectionString
+                ConnectionString = ServiceBusClientSingleton.Instance.ConnectionString
             });
         }
 

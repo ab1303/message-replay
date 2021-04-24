@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
-using Azure.Messaging.ServiceBus;
-using Azure.Messaging.ServiceBus.Administration;
 using MessageReplay.Api.Common;
-using MessageReplay.Api.Common.Infrastructure;
-using MessageReplay.Api.Features.Subscriptions.Queries;
 using MessageReplay.Api.Features.Topics.Responses;
+using MessageReplay.Api.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,32 +16,26 @@ namespace MessageReplay.Api.Features.Subscriptions
 
     public class SubscriptionsController : ControllerBase
     {
-        private readonly ILogger<SubscriptionsController> _logger;
         private readonly IMapper _mapper;
-        private readonly IQueryHandlerAsync<GetSubscriptionMessagesQuery, IEnumerable<GetSubscriptionMessageDto>> _subscriptionMessagesQueryHandler;
-        private readonly IQueryHandlerAsync<GetSubscriptionDeadLettersQuery, IEnumerable<GetSubscriptionDeadLetterDto>> _subscriptionDeadLettersQueryHandler;
-        private readonly ServiceBusClient _client;
+        private readonly ILogger<SubscriptionsController> _logger;
+        private readonly ITopicHelper _topicHelper;
+        private readonly string _connectionString;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="mapper"></param>
-        /// <param name="subscriptionMessagesQueryHandler"></param>
-        /// <param name="subscriptionDeadLettersQueryHandler"></param>
-        public SubscriptionsController(ILogger<SubscriptionsController> logger,
-            IMapper mapper,
-            IQueryHandlerAsync<GetSubscriptionMessagesQuery, IEnumerable<GetSubscriptionMessageDto>> subscriptionMessagesQueryHandler,
-            IQueryHandlerAsync<GetSubscriptionDeadLettersQuery, IEnumerable<GetSubscriptionDeadLetterDto>> subscriptionDeadLettersQueryHandler
-            )
+        /// <param name="topicHelper"></param>
+        public SubscriptionsController(IMapper mapper, ILogger<SubscriptionsController> logger, ITopicHelper topicHelper)
+
         {
             _logger = logger;
             _mapper = mapper;
-            _subscriptionMessagesQueryHandler = subscriptionMessagesQueryHandler;
-            _subscriptionDeadLettersQueryHandler = subscriptionDeadLettersQueryHandler;
-            _client = ServiceBusClientSingleton.Instance.Client;
-        }
+            _topicHelper = topicHelper;
+            _connectionString = ServiceBusClientSingleton.Instance.ConnectionString;
 
+        }
 
         /// <summary>
         /// 
@@ -56,8 +47,7 @@ namespace MessageReplay.Api.Features.Subscriptions
 
         public async Task<IActionResult> GetSubscriptionMessages(string topicName, string subscriptionName)
         {
-            var query = new GetSubscriptionMessagesQuery(topicName, subscriptionName);
-            var messages = await _subscriptionMessagesQueryHandler.GetResultAsync(query);
+            var messages = await _topicHelper.GetMessagesBySubscriptionAsync(_connectionString, topicName, subscriptionName);
 
             return Ok(new GetSubscriptionMessagesResponse
             {
@@ -69,8 +59,7 @@ namespace MessageReplay.Api.Features.Subscriptions
 
         public async Task<IActionResult> GetSubscriptionDeadLetters(string topicName, string subscriptionName)
         {
-            var query = new GetSubscriptionDeadLettersQuery(topicName, subscriptionName);
-            var deadLetters = await _subscriptionDeadLettersQueryHandler.GetResultAsync(query);
+            var deadLetters = await _topicHelper.GetDlqMessagesAsync(_connectionString, topicName, subscriptionName);
 
             return Ok(new GetSubscriptionDeadLettersResponse
             {

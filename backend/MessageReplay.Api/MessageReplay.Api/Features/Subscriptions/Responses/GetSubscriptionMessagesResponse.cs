@@ -1,16 +1,11 @@
-﻿using Azure.Messaging.ServiceBus.Administration;
-using System;
+﻿using MessageReplay.Api.Features.Subscriptions.Responses;
 using System.Collections.Generic;
 
 namespace MessageReplay.Api.Features.Topics.Responses
 {
-    public class GetSubscriptionMessage
+    public class GetSubscriptionMessage: MessageResponse
     {
-        public string MessageId { get; set; }
-        public string Subject { get; set; }
-        public long SequenceNumber { get; set; }
-        public DateTimeOffset EnqueuedTime { get; set; }
-        public DateTimeOffset ExpiresAt { get; set; }
+       
     }
 
     public class GetSubscriptionMessagesResponse

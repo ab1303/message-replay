@@ -1,5 +1,6 @@
 using MessageReplay.Api.Common.Infrastructure;
 using MessageReplay.Api.Features.Subscriptions.Queries;
+using MessageReplay.Api.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -58,8 +59,8 @@ namespace MessageReplay.Api
 
             // DI 
             services
-                .AddScoped<IQueryHandlerAsync<GetSubscriptionMessagesQuery, IEnumerable<GetSubscriptionMessageDto>>, GetSubscriptionMessagesQueryHandler>()
-                .AddScoped<IQueryHandlerAsync<GetSubscriptionDeadLettersQuery, IEnumerable<GetSubscriptionDeadLetterDto>>, GetSubscriptionDeadLettersQueryHandler>()
+                .AddScoped<IQueueHelper, QueueHelper>()
+                .AddScoped<ITopicHelper, TopicHelper>()
                 ;
         }
 

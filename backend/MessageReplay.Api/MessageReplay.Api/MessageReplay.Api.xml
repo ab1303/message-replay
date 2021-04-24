@@ -4,14 +4,6 @@
         <name>MessageReplay.Api</name>
     </assembly>
     <members>
-        <member name="M:MessageReplay.Api.Common.Helpers.ServiceBusPurger.Purge(System.Boolean)">
-            <summary>
-            Purges the messages from a queue, subscription or a dead letter queue. Handles all kinds of queues.
-            </summary>
-            <param name="purgeDeadLetterQueueInstead">If false it will purge the queue, if true it will purge the 
-            dead letter queue instead.</param>
-            <returns>The number of messages purged</returns>
-        </member>
         <member name="P:MessageReplay.Api.Common.Infrastructure.QueryDefaults.PageNumber">
             <summary>
             Current page number
@@ -22,14 +14,13 @@
             Number of items on page
             </summary>
         </member>
-        <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Subscriptions.SubscriptionsController},AutoMapper.IMapper,MessageReplay.Api.Common.Infrastructure.IQueryHandlerAsync{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionMessagesQuery,System.Collections.Generic.IEnumerable{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionMessageDto}},MessageReplay.Api.Common.Infrastructure.IQueryHandlerAsync{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionDeadLettersQuery,System.Collections.Generic.IEnumerable{MessageReplay.Api.Features.Subscriptions.Queries.GetSubscriptionDeadLetterDto}})">
+        <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.#ctor(AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Subscriptions.SubscriptionsController},MessageReplay.Api.Helpers.ITopicHelper)">
             <summary>
             
             </summary>
             <param name="logger"></param>
             <param name="mapper"></param>
-            <param name="subscriptionMessagesQueryHandler"></param>
-            <param name="subscriptionDeadLettersQueryHandler"></param>
+            <param name="topicHelper"></param>
         </member>
         <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.GetSubscriptionMessages(System.String,System.String)">
             <summary>
@@ -39,11 +30,13 @@
             <param name="subscriptionName"></param>
             <returns></returns>
         </member>
-        <member name="M:MessageReplay.Api.Features.Settings.SettingsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Settings.SettingsController})">
+        <member name="M:MessageReplay.Api.Features.Settings.SettingsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Settings.SettingsController},MessageReplay.Api.Helpers.IQueueHelper,MessageReplay.Api.Helpers.ITopicHelper)">
             <summary>
             
             </summary>
             <param name="logger"></param>
+            <param name="queueHelper"></param>
+            <param name="topicHelper"></param>
         </member>
         <member name="M:MessageReplay.Api.Features.Topics.TopicsController.#ctor(Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Topics.TopicsController})">
             <summary>
