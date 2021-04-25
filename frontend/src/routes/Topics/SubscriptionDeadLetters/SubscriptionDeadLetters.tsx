@@ -10,13 +10,10 @@ import {
   useTable,
 } from 'react-table';
 
-import dateformat from 'dateformat';
-
 import { Card, Table, IndeterminateCheckbox } from 'src/components';
 
 import { SubscriptionDeadLettersQueryResponse } from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
-import { DATE_FORMAT } from 'src/constants';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -67,16 +64,24 @@ const SubscriptionDeadLetters: React.FC = () => {
         accessor: 'messageId',
       },
       {
-        Header: 'Subject',
-        accessor: 'subject',
+        Header: 'Content',
+        accessor: 'content',
       },
       {
-        Header: 'Expires At',
-        accessor: 'expiresAt',
-        Cell: ({ row }: CellProps<any>) => {
-          console.log('row props', row);
-          return dateformat(row.values['expiresAt'], DATE_FORMAT);
-        },
+        Header: 'Sequence Number',
+        accessor: 'sequenceNumber',
+      },
+      {
+        Header: 'Size',
+        accessor: 'size',
+      },
+      {
+        Header: 'Delivery Count',
+        accessor: 'deliveryCount',
+      },
+      {
+        Header: 'Dead Letter Reason',
+        accessor: 'deadLetterReason',
       },
     ],
     [],

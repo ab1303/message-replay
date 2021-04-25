@@ -16,25 +16,12 @@ namespace MessageReplay.Api.Helpers
     {
         private int _maxMessageCount = 100;
 
-        public async Task<IList<ServiceBusQueue>> GetQueuesAsync(string connectionString)
+        public async Task<IList<string>> GetQueuesAsync(string connectionString)
         {
-            IList<ServiceBusQueue> queues = new List<ServiceBusQueue>();
             var client = new ManagementClient(connectionString);
             var queuesInfo = await client.GetQueuesRuntimeInfoAsync();
             await client.CloseAsync();
-
-            await Task.WhenAll(queuesInfo.Select(async queue =>
-            {
-                var queueName = queue.Path;
-
-                var newQueue = new ServiceBusQueue(queue)
-                {
-                    Name = queueName
-                };
-
-                queues.Add(newQueue);
-            }));
-
+            var queues = queuesInfo.Select(queue => queue.Path).ToList();
             return queues;
         }
 
@@ -164,7 +151,7 @@ namespace MessageReplay.Api.Helpers
 
     public interface IQueueHelper
     {
-        Task<IList<ServiceBusQueue>> GetQueuesAsync(string connectionString);
+        Task<IList<string>> GetQueuesAsync(string connectionString);
         public Task SendMessageAsync(string connectionString, string topicPath, string content);
         public Task SendMessageAsync(string connectionString, string topicPath, AzureMessage message);
         Task<IList<Message>> GetMessagesAsync(string connectionString, string queueName);

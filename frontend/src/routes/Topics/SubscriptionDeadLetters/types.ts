@@ -1,9 +1,11 @@
 export type SubscriptionDeadLettersQueryResponse = {
   messageId: string;
-  subject: string;
+  content: string;
   sequenceNumber: number;
-  enqueuedTime: Date;
-  expiresAt: Date;
+  size: number;
+  deliveryCount: number;
+  deadLetterReason: string;
+  isDlq: boolean;
 };
 
 export type SubscriptionDeadLettersQueryResponsePayload = {

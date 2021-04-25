@@ -6,10 +6,21 @@ import { Card, Table } from 'src/components';
 import { Path } from 'src/router';
 import { useSubscriptionsQuery } from './useSubscriptionsQuery';
 import { DATE_FORMAT } from 'src/constants';
+import { useAppDispatch } from 'src/providers/AppStateProvider';
+import { SubscriptionListEvent, SubscriptionsQueryResponse } from './types';
 
 const SubscriptionList: React.FC = () => {
+  const appDispatch = useAppDispatch();
   const { topic } = useParams<{ topic: string }>();
   const { data, isFetched } = useSubscriptionsQuery(topic);
+
+  const selectSubscriptionHandler = (
+    subscription: SubscriptionsQueryResponse,
+  ) =>
+    appDispatch({
+      type: SubscriptionListEvent.SUBSCRIPTION_SELECTED,
+      payload: subscription,
+    });
 
   return (
     <Card>
@@ -34,7 +45,12 @@ const SubscriptionList: React.FC = () => {
               return (
                 <Table.TBody.TR key={subscription.name}>
                   <Table.TBody.TD>
-                    <Link to={subscriptionPath}>{subscription.name}</Link>
+                    <Link
+                      onClick={() => selectSubscriptionHandler(subscription)}
+                      to={subscriptionPath}
+                    >
+                      {subscription.name}
+                    </Link>
                   </Table.TBody.TD>
                   <Table.TBody.TD>
                     {subscription.activeMessageCount}

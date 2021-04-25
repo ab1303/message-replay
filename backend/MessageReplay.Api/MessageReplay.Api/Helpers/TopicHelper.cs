@@ -16,16 +16,13 @@ namespace MessageReplay.Api.Helpers
     {
         private int _maxMessageCount = 100;
 
-        public async Task<IList<ServiceBusTopic>> GetTopicsAsync(string connectionString)
+        public async Task<IList<string>> GetTopicsAsync(string connectionString)
         {
             var client = new ManagementClient(connectionString);
             var busTopics = await client.GetTopicsAsync();
             await client.CloseAsync();
             
-            var topics = busTopics.Select(t => new ServiceBusTopic
-            {
-                Name = t.Path
-            }).ToList();
+            var topics = busTopics.Select(t => t.Path).ToList();
 
             return topics;
         }
@@ -206,7 +203,7 @@ namespace MessageReplay.Api.Helpers
     public interface ITopicHelper
     {
         public Task<NamespaceInfo> GetNamespaceInfoAsync(string connectionString);
-        public Task<IList<ServiceBusTopic>> GetTopicsAsync(string connectionString);
+        public Task<IList<string>> GetTopicsAsync(string connectionString);
         public Task<IList<ServiceBusSubscription>> GetSubscriptionsAsync(string connectionString, string topicPath);
         public Task<IList<Message>> GetDlqMessagesAsync(string connectionString, string topic, string subscription);
         public Task<IList<Message>> GetMessagesBySubscriptionAsync(string connectionString, string topicName, string subscriptionName);

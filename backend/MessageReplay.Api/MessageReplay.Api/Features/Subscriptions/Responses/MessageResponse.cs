@@ -8,7 +8,8 @@ namespace MessageReplay.Api.Features.Subscriptions.Responses
         public string Content { get; set; }
         public long SequenceNumber { get; set; }
         public long Size { get; set; }
-        public DateTimeOffset EnqueueTimeUtc { get; set; }
+        public int DeliveryCount { get; set; }
+        public string DeadLetterReason { get; set; }
         public bool IsDlq { get; }
     }
 }

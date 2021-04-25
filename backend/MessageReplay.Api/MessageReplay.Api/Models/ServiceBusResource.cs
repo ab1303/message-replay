@@ -7,8 +7,8 @@ namespace MessageReplay.Api.Models
     {
         public string Name { get; set; }
         public string ConnectionString { get; set; }
-        public IEnumerable<ServiceBusQueue> Queues { get; set; }
-        public IEnumerable<ServiceBusTopic> Topics { get; set; }
+        public IEnumerable<string> Queues { get; set; }
+        public IEnumerable<string> Topics { get; set; }
               
     }
 }

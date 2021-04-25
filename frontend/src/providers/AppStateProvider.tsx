@@ -13,6 +13,7 @@ const initialAppState: AppState = {
     queues: [],
     topics: [],
   },
+  selectedSubscription: null,
 };
 
 const AppStateContext = React.createContext<AppState>(initialAppState);

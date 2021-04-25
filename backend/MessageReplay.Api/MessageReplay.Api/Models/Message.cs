@@ -15,6 +15,7 @@ namespace MessageReplay.Api.Models
         public long SequenceNumber { get; set; }
         public TimeSpan TimeToLive { get; set; }
         public DateTime EnqueueTimeUtc { get; set; }
+        public DateTime ExpiresAt { get; set; }
         public string DeadLetterReason { get; set; }
         public bool IsDlq { get; }
         
@@ -30,6 +31,7 @@ namespace MessageReplay.Api.Models
             this.TimeToLive = azureMessage.TimeToLive;
             this.IsDlq = isDlq;
             this.EnqueueTimeUtc = azureMessage.SystemProperties.EnqueuedTimeUtc;
+            this.ExpiresAt = azureMessage.ExpiresAtUtc;
             this.DeadLetterReason = azureMessage.UserProperties.ContainsKey("DeadLetterReason")
                 ? azureMessage.UserProperties["DeadLetterReason"].ToString()
                 : string.Empty;
