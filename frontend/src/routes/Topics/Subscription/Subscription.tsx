@@ -1,6 +1,6 @@
 import { Tab, TabList, TabPanels, Tabs } from '@chakra-ui/core';
 import React from 'react';
-import { Link, useRouteMatch, Route, Switch } from 'react-router-dom';
+import { NavLink, useRouteMatch, Route, Switch } from 'react-router-dom';
 import { useAppState } from 'src/providers/AppStateProvider';
 
 import SubscriptionDeadLetters from '../SubscriptionDeadLetters';
@@ -10,19 +10,23 @@ const SubscriptionList: React.FC = () => {
   const match = useRouteMatch();
   const { selectedSubscription } = useAppState();
   if (!match || !selectedSubscription) return null;
+  const url = window.location.href;
+
+  const tabDefaultIndex = url.indexOf('deadletters') > 0 ? 1 : 0;
 
   return (
-    <Tabs>
+    // @ts-ignore
+    <Tabs defaultIndex={tabDefaultIndex}>
       <TabList>
         <Tab>
-          <Link to={`${match.url}/messages`}>
+          <NavLink to={`${match.url}/messages`}>
             Messages - ({selectedSubscription.activeMessageCount})
-          </Link>
+          </NavLink>
         </Tab>
         <Tab>
-          <Link to={`${match.url}/deadletters`}>
+          <NavLink to={`${match.url}/deadletters`}>
             Dead Letters - ({selectedSubscription.deadLetterMessageCount})
-          </Link>
+          </NavLink>
         </Tab>
       </TabList>
       <TabPanels>

@@ -1,5 +1,5 @@
 export type SubscriptionsQueryResponse = {
-  activeMessageCount: string;
+  activeMessageCount: number;
   createdAt: Date;
   deadLetterMessageCount: number;
   name: string;

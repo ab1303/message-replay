@@ -10,6 +10,18 @@ import {
   useTable,
 } from 'react-table';
 
+import { MdMoreHoriz, MdMoreVert } from 'react-icons/md';
+
+import {
+  Button,
+  Flex,
+  Icon,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+} from '@chakra-ui/core';
+
 import { Card, Table, IndeterminateCheckbox } from 'src/components';
 
 import { SubscriptionDeadLettersQueryResponse } from './types';
@@ -60,16 +72,19 @@ const SubscriptionDeadLetters: React.FC = () => {
   const columns = React.useMemo<Column<SubscriptionDeadLettersQueryResponse>[]>(
     () => [
       {
+        Header: 'Sequence Number',
+        accessor: 'sequenceNumber',
+      },
+      {
         Header: 'Message Id',
         accessor: 'messageId',
       },
       {
         Header: 'Content',
-        accessor: 'content',
-      },
-      {
-        Header: 'Sequence Number',
-        accessor: 'sequenceNumber',
+        Cell: ({ row }: CellProps<any>) => (
+          // @ts-ignore
+          <Icon name="email" />
+        ),
       },
       {
         Header: 'Size',
@@ -111,38 +126,52 @@ const SubscriptionDeadLetters: React.FC = () => {
     /* eslint-disable react/jsx-key */
     <Card>
       <Card.Header>
-        <Card.Header.Title>Subscription Dead Letters</Card.Header.Title>
+        <Flex textAlign="right" justify="space-between">
+          <Card.Header.Title>Subscription Dead Letters</Card.Header.Title>
+          <Menu>
+            <MenuButton as={Button}>
+              <MdMoreVert />
+            </MenuButton>
+            <MenuList>
+              <MenuItem>Purge all</MenuItem>
+              <MenuItem>Purge selected</MenuItem>
+              <MenuItem>Resubmit all to Topic</MenuItem>
+              <MenuItem>Resubmit selected to Topic</MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
       </Card.Header>
-
-      <Table {...getTableProps()}>
-        <Table.THead>
-          {headerGroups.map(headerGroup => (
-            <Table.THead.TR {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <Table.THead.TH {...column.getHeaderProps()}>
-                  {column.render('Header')}
-                </Table.THead.TH>
-              ))}
-            </Table.THead.TR>
-          ))}
-        </Table.THead>
-        <Table.TBody {...getTableBodyProps()}>
-          {rows.map(row => {
-            prepareRow(row);
-            return (
-              <Table.TBody.TR {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return (
-                    <Table.TBody.TD {...cell.getCellProps()}>
-                      {cell.render('Cell')}
-                    </Table.TBody.TD>
-                  );
-                })}
-              </Table.TBody.TR>
-            );
-          })}
-        </Table.TBody>
-      </Table>
+      <Card.Body>
+        <Table {...getTableProps()}>
+          <Table.THead>
+            {headerGroups.map(headerGroup => (
+              <Table.THead.TR {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
+                  <Table.THead.TH {...column.getHeaderProps()}>
+                    {column.render('Header')}
+                  </Table.THead.TH>
+                ))}
+              </Table.THead.TR>
+            ))}
+          </Table.THead>
+          <Table.TBody {...getTableBodyProps()}>
+            {rows.map(row => {
+              prepareRow(row);
+              return (
+                <Table.TBody.TR {...row.getRowProps()}>
+                  {row.cells.map(cell => {
+                    return (
+                      <Table.TBody.TD {...cell.getCellProps()}>
+                        {cell.render('Cell')}
+                      </Table.TBody.TD>
+                    );
+                  })}
+                </Table.TBody.TR>
+              );
+            })}
+          </Table.TBody>
+        </Table>
+      </Card.Body>
     </Card>
   );
 };

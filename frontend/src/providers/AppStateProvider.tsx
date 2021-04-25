@@ -2,6 +2,7 @@ import React, { Dispatch, useContext, useReducer } from 'react';
 import { appReducer } from 'src/reducer';
 import { Actions, AppState } from 'src/types';
 
+// TODO Reset State
 const initialAppState: AppState = {
   isLoading: false,
   settings: {
@@ -13,7 +14,13 @@ const initialAppState: AppState = {
     queues: [],
     topics: [],
   },
-  selectedSubscription: null,
+  // selectedSubscription: null,
+  selectedSubscription: {
+    activeMessageCount: 0,
+    createdAt: new Date('2021-03-18T10:54:48.2479522+11:00'),
+    deadLetterMessageCount: 167,
+    name: 'replay-poc-subscription',
+  },
 };
 
 const AppStateContext = React.createContext<AppState>(initialAppState);
