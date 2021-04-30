@@ -1,9 +1,10 @@
 export type SubscriptionMessagesQueryResponse = {
   messageId: string;
-  subject: string;
+  content: string;
   sequenceNumber: number;
-  enqueuedTime: Date;
-  expiresAt: Date;
+  size: number;
+  deliveryCount: number;
+  isDlq: boolean;
 };
 
 export type SubscriptionMessagesQueryResponsePayload = {

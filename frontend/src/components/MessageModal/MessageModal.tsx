@@ -13,10 +13,15 @@ import {
 import Card from '../Card';
 import { Table } from '..';
 import { SubscriptionDeadLettersQueryResponse } from 'src/routes/Topics/SubscriptionDeadLetters/types';
+import { SubscriptionMessagesQueryResponse } from 'src/routes/Topics/SubscriptionMessages/types';
+
+type responseType =
+  | SubscriptionDeadLettersQueryResponse
+  | SubscriptionMessagesQueryResponse;
 
 interface MessageModalProps extends Pick<IModal, 'isOpen' | 'onClose'> {
-  message: SubscriptionDeadLettersQueryResponse | null;
-  displayProps: Array<keyof SubscriptionDeadLettersQueryResponse>;
+  message: responseType | null;
+  displayProps: Array<keyof responseType>;
 }
 
 const MessageModal: React.FC<MessageModalProps> = ({
@@ -25,10 +30,8 @@ const MessageModal: React.FC<MessageModalProps> = ({
   message,
   displayProps,
 }) => {
-  const getMessageProp = (
-    obj: SubscriptionDeadLettersQueryResponse,
-    key: keyof SubscriptionDeadLettersQueryResponse,
-  ) => obj[key];
+  const getMessageProp = (obj: responseType, key: keyof responseType) =>
+    obj[key];
 
   return (
     <Modal blockScrollOnMount isOpen={isOpen} onClose={onClose}>
@@ -41,23 +44,21 @@ const MessageModal: React.FC<MessageModalProps> = ({
             <Table>
               <Table.TBody>
                 {message &&
-                  displayProps.map(
-                    (prop: keyof SubscriptionDeadLettersQueryResponse) => (
-                      <Table.TBody.TR key={prop}>
-                        <Table.TBody.TD>{prop}</Table.TBody.TD>
-                        <Table.TBody.TD>
-                          {prop == 'content' ? (
-                            <JSONPretty
-                              id="json-pretty"
-                              data={message.content}
-                            ></JSONPretty>
-                          ) : (
-                            getMessageProp(message, prop)
-                          )}
-                        </Table.TBody.TD>
-                      </Table.TBody.TR>
-                    ),
-                  )}
+                  displayProps.map((prop: keyof responseType) => (
+                    <Table.TBody.TR key={prop}>
+                      <Table.TBody.TD>{prop}</Table.TBody.TD>
+                      <Table.TBody.TD>
+                        {prop == 'content' ? (
+                          <JSONPretty
+                            id="json-pretty"
+                            data={message.content}
+                          ></JSONPretty>
+                        ) : (
+                          getMessageProp(message, prop)
+                        )}
+                      </Table.TBody.TD>
+                    </Table.TBody.TR>
+                  ))}
               </Table.TBody>
             </Table>
           </Card>

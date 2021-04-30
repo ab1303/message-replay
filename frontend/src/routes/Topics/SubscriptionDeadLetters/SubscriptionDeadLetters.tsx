@@ -10,7 +10,7 @@ import {
   useTable,
 } from 'react-table';
 
-import { MdMoreHoriz, MdMoreVert } from 'react-icons/md';
+import { MdMoreVert } from 'react-icons/md';
 
 import {
   Button,
@@ -63,7 +63,6 @@ const selectionHook = (hooks: Hooks<any>) => {
 
 const SubscriptionDeadLetters: React.FC = () => {
   const [modalRowIndex, setModalRowIndex] = useState<number | null>(null);
-
   const { topic, subscription } = useParams<{
     topic: string;
     subscription: string;
@@ -131,6 +130,7 @@ const SubscriptionDeadLetters: React.FC = () => {
     getTableBodyProps,
     headerGroups,
     rows,
+    selectedFlatRows,
     prepareRow,
   } = useTable<SubscriptionDeadLettersQueryResponse>(
     {
@@ -140,6 +140,7 @@ const SubscriptionDeadLetters: React.FC = () => {
     ...hooks,
   );
 
+  console.log('selected Flat Rows', selectedFlatRows);
   return (
     /* eslint-disable react/jsx-key */
     <Card>
