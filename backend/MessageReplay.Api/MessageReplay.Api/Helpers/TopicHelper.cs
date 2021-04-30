@@ -84,6 +84,12 @@ namespace MessageReplay.Api.Helpers
             return await client.GetNamespaceInfoAsync();
         }
 
+        /// <summary>
+        /// Use this to publish a message to the topic
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <param name="topicPath"></param>
+        /// <param name="content"></param>
         public async Task SendMessageAsync(string connectionString, string topicPath, string content)
         {
             var message = new AzureMessage {Body = Encoding.UTF8.GetBytes(content)};
@@ -95,6 +101,22 @@ namespace MessageReplay.Api.Helpers
             var topicClient = new TopicClient(connectionString, topicPath);
             await topicClient.SendAsync(message);
             await topicClient.CloseAsync();
+        }
+
+        public async Task DeleteMessageAsyncFromDlq(
+            string connectionString,
+            string topicPath,
+            string subscriptionPath,
+            IEnumerable<AzureMessage> messages)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+            var dlqPath = EntityNameHelper.FormatDeadLetterPath(path);
+            var receiver = new MessageReceiver(connectionString, dlqPath, ReceiveMode.PeekLock);
+            foreach (var message in messages)
+            {
+                await receiver.CompleteAsync(message.SystemProperties.LockToken);
+            }
+            await receiver.CloseAsync();
         }
 
         public async Task DeleteMessageAsync(string connectionString, string topicPath, string subscriptionPath,
@@ -198,6 +220,8 @@ namespace MessageReplay.Api.Helpers
 
             await receiver.CloseAsync();
         }
+
+        
     }
 
     public interface ITopicHelper

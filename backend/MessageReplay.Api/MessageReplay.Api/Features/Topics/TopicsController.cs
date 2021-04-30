@@ -51,6 +51,5 @@ namespace MessageReplay.Api.Features.Topics
                 Subscriptions = subscriptionsList
             });
         }
-
     }
 }

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using MessageReplay.Api.Common;
 
 namespace MessageReplay.Api
 {
@@ -31,11 +32,12 @@ namespace MessageReplay.Api
             services.AddLogging(x => x.AddConsole());
 
             services.AddAutoMapper(typeof(Startup));
-
+            
             services.AddControllers()
                  .AddJsonOptions(options =>
                  {
                      options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                     options.JsonSerializerOptions.Converters.Add(new TimeSpanConverter());
                  });
 
             services.AddSwaggerGen(c =>
@@ -61,7 +63,8 @@ namespace MessageReplay.Api
             services
                 .AddScoped<IQueueHelper, QueueHelper>()
                 .AddScoped<ITopicHelper, TopicHelper>()
-                ;
+                .AddSingleton<ReplayMessageService>()
+                .AddSingleton<UnitOfWorkTopic>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
