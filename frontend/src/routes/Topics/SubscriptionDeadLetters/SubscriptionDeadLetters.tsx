@@ -193,9 +193,8 @@ const SubscriptionDeadLetters: React.FC = () => {
         <MessageModal
           isOpen={isOpen}
           onClose={onClose}
-          payload={
-            modalRowIndex != null ? tableData[modalRowIndex].content : ''
-          }
+          message={modalRowIndex != null ? tableData[modalRowIndex] : null}
+          displayProps={['messageId', 'content']}
         />
       </Card.Body>
     </Card>
