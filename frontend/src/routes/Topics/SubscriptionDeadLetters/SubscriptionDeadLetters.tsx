@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   CellProps,
@@ -20,12 +20,14 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  useDisclosure,
 } from '@chakra-ui/core';
 
 import { Card, Table, IndeterminateCheckbox } from 'src/components';
 
 import { SubscriptionDeadLettersQueryResponse } from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
+import MessageModal from 'src/components/MessageModal';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -60,6 +62,8 @@ const selectionHook = (hooks: Hooks<any>) => {
 };
 
 const SubscriptionDeadLetters: React.FC = () => {
+  const [modalRowIndex, setModalRowIndex] = useState<number | null>(null);
+
   const { topic, subscription } = useParams<{
     topic: string;
     subscription: string;
@@ -68,6 +72,8 @@ const SubscriptionDeadLetters: React.FC = () => {
     topic,
     subscription,
   );
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const columns = React.useMemo<Column<SubscriptionDeadLettersQueryResponse>[]>(
     () => [
@@ -81,10 +87,22 @@ const SubscriptionDeadLetters: React.FC = () => {
       },
       {
         Header: 'Content',
-        Cell: ({ row }: CellProps<any>) => (
-          // @ts-ignore
-          <Icon name="email" />
-        ),
+        Cell: ({ row }: CellProps<any>) => {
+          const { index } = row;
+
+          return (
+            // @ts-ignore
+            <Icon
+              style={{ cursor: 'hand' }}
+              onClick={() => {
+                setModalRowIndex(index);
+                onOpen();
+              }}
+              // onClick={onOpen}
+              name="email"
+            />
+          );
+        },
       },
       {
         Header: 'Size',
@@ -171,6 +189,14 @@ const SubscriptionDeadLetters: React.FC = () => {
             })}
           </Table.TBody>
         </Table>
+
+        <MessageModal
+          isOpen={isOpen}
+          onClose={onClose}
+          payload={
+            modalRowIndex != null ? tableData[modalRowIndex].content : ''
+          }
+        />
       </Card.Body>
     </Card>
   );
