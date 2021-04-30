@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using MessageReplay.Api.Common;
 using MessageReplay.Api.Features.Topics.Responses;
 using MessageReplay.Api.Helpers;
@@ -19,6 +20,7 @@ namespace MessageReplay.Api.Features.Subscriptions
         private readonly IMapper _mapper;
         private readonly ILogger<SubscriptionsController> _logger;
         private readonly ITopicHelper _topicHelper;
+        private readonly ReplayMessageService _replayMessageService;
         private readonly string _connectionString;
 
         /// <summary>
@@ -27,12 +29,17 @@ namespace MessageReplay.Api.Features.Subscriptions
         /// <param name="logger"></param>
         /// <param name="mapper"></param>
         /// <param name="topicHelper"></param>
-        public SubscriptionsController(IMapper mapper, ILogger<SubscriptionsController> logger, ITopicHelper topicHelper)
+        public SubscriptionsController(
+            IMapper mapper,
+            ILogger<SubscriptionsController> logger,
+            ITopicHelper topicHelper,
+            ReplayMessageService replayMessageService)
 
         {
             _logger = logger;
             _mapper = mapper;
             _topicHelper = topicHelper;
+            _replayMessageService = replayMessageService;
             _connectionString = ServiceBusClientSingleton.Instance.ConnectionString;
 
         }
@@ -47,7 +54,8 @@ namespace MessageReplay.Api.Features.Subscriptions
 
         public async Task<IActionResult> GetSubscriptionMessages(string topicName, string subscriptionName)
         {
-            var messages = await _topicHelper.GetMessagesBySubscriptionAsync(_connectionString, topicName, subscriptionName);
+            var messages =
+                await _topicHelper.GetMessagesBySubscriptionAsync(_connectionString, topicName, subscriptionName);
 
             return Ok(new GetSubscriptionMessagesResponse
             {
@@ -67,5 +75,19 @@ namespace MessageReplay.Api.Features.Subscriptions
             });
         }
 
+        [HttpPost("{subscriptionName}/deadletters/Resubmit", Name = "Resubmit")]
+        public async Task<IActionResult> ReplayAllMessages(string topicName, string subscriptionName)
+        {
+            var result = await _replayMessageService.StartReplayingMessages(_connectionString, topicName, subscriptionName);
+            return Accepted(result);
+        }
+
+
+        [HttpGet("{subscriptionName}/deadletters/resubmit/status/{processId}", Name = "ResubmitStatus")]
+        public async Task<IActionResult> GetStatus(string topicName, string subscriptionName,Guid processId)
+        {
+            var result = await _replayMessageService.GetStatus(topicName,subscriptionName);
+            return Ok(result);
+        }
     }
 }
