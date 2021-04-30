@@ -5,6 +5,7 @@ using MessageReplay.Api.Features.Topics.Responses;
 using MessageReplay.Api.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -89,5 +90,37 @@ namespace MessageReplay.Api.Features.Subscriptions
             var result = await _replayMessageService.GetStatus(topicName,subscriptionName);
             return Ok(result);
         }
+        [HttpPost("{subscriptionName}/deadletters/purgeselected", Name = "PurgeSelectedSubscriptionDeadLetters")]
+
+        public async Task<IActionResult> PurgeSelectedSubscriptionDeadLetters(string topicName, string subscriptionName, [FromBody] string [] messageIds)
+        {
+            try
+            {
+                var result = await _topicHelper.PurgeDlqMessagesBySequenceNumbers(_connectionString, topicName, subscriptionName, messageIds);
+                if (result)
+                    return NoContent();
+                else return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{subscriptionName}/deadletters", Name = "PurgeAllSubscriptionDeadLetters")]
+
+        public async Task<IActionResult> PurgeAllSubscriptionDeadLetters(string topicName, string subscriptionName, [FromBody] long[] sequenceNo)
+        {
+            try
+            {
+                await _topicHelper.PurgeMessagesAsync(_connectionString, topicName, subscriptionName, true);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
     }
 }

@@ -170,6 +170,32 @@ namespace MessageReplay.Api.Helpers
             return purgedCount;
         }
 
+        public async Task<bool> PurgeDlqMessagesBySequenceNumbers(string connectionString, string topicPath,
+            string subscriptionPath, string [] messageIds)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+            var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
+
+            var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
+            var messages = await receiver.ReceiveAsync(_maxMessageCount);
+            if (messages == null || messages.Count == 0)
+            {
+                return false;
+            }
+            
+            foreach (string msgId in messageIds)
+            {
+                var azureMessage = messages.FirstOrDefault(m => m.MessageId.Equals(msgId));
+                if (azureMessage != null)
+                {
+                    await receiver.CompleteAsync(azureMessage.SystemProperties.LockToken);
+                }
+            }
+           
+            await receiver.CloseAsync();
+            return true;
+        }
+
         private async Task<AzureMessage> PeekDlqMessageBySequenceNumber(string connectionString, string topicPath,
             string subscriptionPath, long sequenceNumber)
         {
@@ -241,5 +267,7 @@ namespace MessageReplay.Api.Helpers
             Message message);
         public Task DeadletterMessageAsync(string connectionString, string topicPath, string subscriptionPath,
             Message message);
+        public Task<bool> PurgeDlqMessagesBySequenceNumbers(string connectionString, string topicPath,
+            string subscriptionPath, string[] messageIds);
     }
 }
