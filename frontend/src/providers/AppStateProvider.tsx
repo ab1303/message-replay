@@ -6,22 +6,35 @@ import { Actions, AppState } from 'src/types';
 const initialAppState: AppState = {
   isLoading: false,
   settings: {
-    // connectionString: '',
-    connectionString:
-      'Endpoint=sb://replay-infinitum.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=hUpRvIHz6uJSMzyLI0/4PpQ/oSa+CI9v65CQ/IdwZSA=',
+    connectionString: '',
   },
   entity: {
     queues: [],
     topics: [],
   },
-  // selectedSubscription: null,
-  selectedSubscription: {
-    activeMessageCount: 0,
-    createdAt: new Date('2021-03-18T10:54:48.2479522+11:00'),
-    deadLetterMessageCount: 167,
-    name: 'replay-poc-subscription',
-  },
+  selectedSubscription: null,
 };
+
+// Uncomment to Load State quickly
+// const initialAppState: AppState = {
+//   isLoading: false,
+//   settings: {
+//     // connectionString: '',
+//     connectionString:
+//       'Endpoint=sb://replay-infinitum.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=hUpRvIHz6uJSMzyLI0/4PpQ/oSa+CI9v65CQ/IdwZSA=',
+//   },
+//   entity: {
+//     queues: [],
+//     topics: ['replay-poc-topic'],
+//   },
+//   // selectedSubscription: null,
+//   selectedSubscription: {
+//     activeMessageCount: 0,
+//     createdAt: new Date('2021-03-18T10:54:48.2479522+11:00'),
+//     deadLetterMessageCount: 167,
+//     name: 'replay-poc-subscription',
+//   },
+// };
 
 const AppStateContext = React.createContext<AppState>(initialAppState);
 

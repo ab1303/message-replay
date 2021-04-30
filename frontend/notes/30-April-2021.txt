@@ -1,0 +1,19 @@
+- /api/servicebus/topics/{topicName}/Subscriptions/{subscriptionName}/deadletters
+
+
+ - POST 
+    /api/servicebus/topics/{topicName}/Subscriptions/{subscriptionName}/deadletters/ResubmitAll
+
+    201 - Accepted
+    Body
+     {
+         callBackAfter: '3s',
+         url: 'https://MessageBusStatus'
+     }
+
+- Get https://MessageBusStatus
+  Body {
+      callBackAfter: '3s',
+      errorsCount:
+      processedCount:
+  }
