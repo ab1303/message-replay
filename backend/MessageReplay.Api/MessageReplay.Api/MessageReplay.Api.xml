@@ -14,7 +14,7 @@
             Number of items on page
             </summary>
         </member>
-        <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.#ctor(AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Subscriptions.SubscriptionsController},MessageReplay.Api.Helpers.ITopicHelper)">
+        <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.#ctor(AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{MessageReplay.Api.Features.Subscriptions.SubscriptionsController},MessageReplay.Api.Helpers.ITopicHelper,MessageReplay.Api.Common.ReplayMessageService)">
             <summary>
             
             </summary>
@@ -43,6 +43,14 @@
             
             </summary>
             <param name="logger"></param>
+        </member>
+        <member name="M:MessageReplay.Api.Helpers.TopicHelper.SendMessageAsync(System.String,System.String,System.String)">
+            <summary>
+            Use this to publish a message to the topic
+            </summary>
+            <param name="connectionString"></param>
+            <param name="topicPath"></param>
+            <param name="content"></param>
         </member>
     </members>
 </doc>

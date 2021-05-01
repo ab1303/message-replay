@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, BoxProps, Spinner } from '@chakra-ui/core';
+import { Box, BoxProps } from '@chakra-ui/core';
 
 import { SideNavMode } from './modules/constants';
 import SideNavItem from './SideNavItem';
@@ -7,6 +7,7 @@ import SideNavProfile from './SideNavProfile';
 import SideNavMenu from './SideNavMenu';
 import { useAppState } from 'src/providers/AppStateProvider';
 import { Path, routeTo } from 'src/router';
+import { DefaultSpinner } from 'src/components';
 
 type Props = BoxProps & {
   mode?: SideNavMode;
@@ -21,7 +22,7 @@ const SideNavContent: React.FC<Props> = ({ mode, ...props }) => {
     <Box as="nav" aria-label="Main navigation" fontSize="sm" px="6" {...props}>
       <SideNavProfile mode={mode} />
       {appState.isLoading ? (
-        <Spinner thickness="4px" size="md" color="teal.500" />
+        <DefaultSpinner />
       ) : (
         <SideNavMenu mode={mode} label="Service Bus Entity">
           {!!queues.length && (

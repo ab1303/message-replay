@@ -10,11 +10,11 @@ import {
   Box,
   Heading,
   Stack,
-  Spinner,
 } from '@chakra-ui/core';
 import { SettingsEvent, SettingsFormData } from './types';
 import { useSettingsMutation } from './useSettingsMutation';
 import { useAppDispatch, useAppState } from 'src/providers/AppStateProvider';
+import { DefaultSpinner } from 'src/components';
 
 const Settings: React.FC = () => {
   const appState = useAppState();
@@ -77,7 +77,7 @@ const Settings: React.FC = () => {
             shadow="1px 1px 3px rgba(0,0,0,0.3)"
           >
             {appState.isLoading ? (
-              <Spinner thickness="4px" size="md" color="teal.500" />
+              <DefaultSpinner />
             ) : (
               <Stack margin="auto" spacing={5}>
                 <FormControl isInvalid={!!errors.connectionString}>

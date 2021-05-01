@@ -23,10 +23,14 @@ import {
   useDisclosure,
 } from '@chakra-ui/core';
 
-import { Card, Table, IndeterminateCheckbox } from 'src/components';
+import {
+  Card,
+  Table,
+  IndeterminateCheckbox,
+  MessageModal,
+} from 'src/components';
 import { SubscriptionMessagesQueryResponse } from './types';
 import { useSubscriptionMessagesQuery } from './useSubscriptionMessagesQuery';
-import MessageModal from 'src/components/MessageModal';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [

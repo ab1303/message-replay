@@ -22,7 +22,9 @@ const TBodyTD: React.FC = ({ children }) => {
 
   return (
     <Wrapper>
-      <Text color={color}>{children}</Text>
+      <Text as="span" color={color}>
+        {children}
+      </Text>
     </Wrapper>
   );
 };

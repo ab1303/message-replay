@@ -90,6 +90,7 @@ namespace MessageReplay.Api.Features.Subscriptions
             var result = await _replayMessageService.GetStatus(topicName,subscriptionName);
             return Ok(result);
         }
+
         [HttpPost("{subscriptionName}/deadletters/purgeselected", Name = "PurgeSelectedSubscriptionDeadLetters")]
 
         public async Task<IActionResult> PurgeSelectedSubscriptionDeadLetters(string topicName, string subscriptionName, [FromBody] string [] messageIds)

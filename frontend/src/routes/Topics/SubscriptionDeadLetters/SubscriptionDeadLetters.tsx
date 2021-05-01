@@ -23,11 +23,16 @@ import {
   useDisclosure,
 } from '@chakra-ui/core';
 
-import { Card, Table, IndeterminateCheckbox } from 'src/components';
+import {
+  Card,
+  Table,
+  IndeterminateCheckbox,
+  TableDataLoadingSpinner,
+  MessageModal,
+} from 'src/components';
 
 import { SubscriptionDeadLettersQueryResponse } from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
-import MessageModal from 'src/components/MessageModal';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -67,7 +72,7 @@ const SubscriptionDeadLetters: React.FC = () => {
     topic: string;
     subscription: string;
   }>();
-  const { data, isFetched } = useSubscriptionDeadLettersQuery(
+  const { data, isFetched, isFetching } = useSubscriptionDeadLettersQuery(
     topic,
     subscription,
   );
@@ -174,20 +179,24 @@ const SubscriptionDeadLetters: React.FC = () => {
             ))}
           </Table.THead>
           <Table.TBody {...getTableBodyProps()}>
-            {rows.map(row => {
-              prepareRow(row);
-              return (
-                <Table.TBody.TR {...row.getRowProps()}>
-                  {row.cells.map(cell => {
-                    return (
-                      <Table.TBody.TD {...cell.getCellProps()}>
-                        {cell.render('Cell')}
-                      </Table.TBody.TD>
-                    );
-                  })}
-                </Table.TBody.TR>
-              );
-            })}
+            {isFetching ? (
+              <TableDataLoadingSpinner />
+            ) : (
+              rows.map(row => {
+                prepareRow(row);
+                return (
+                  <Table.TBody.TR {...row.getRowProps()}>
+                    {row.cells.map(cell => {
+                      return (
+                        <Table.TBody.TD {...cell.getCellProps()}>
+                          {cell.render('Cell')}
+                        </Table.TBody.TD>
+                      );
+                    })}
+                  </Table.TBody.TR>
+                );
+              })
+            )}
           </Table.TBody>
         </Table>
 
