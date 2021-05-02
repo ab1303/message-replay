@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Message = MessageReplay.Api.Models.Message;
 using AzureMessage = Microsoft.Azure.ServiceBus.Message;
+using MessageReplay.Api.Dto;
+using MessageReplay.Api.Common;
 
 namespace MessageReplay.Api.Helpers
 {
@@ -21,7 +23,7 @@ namespace MessageReplay.Api.Helpers
             var client = new ManagementClient(connectionString);
             var busTopics = await client.GetTopicsAsync();
             await client.CloseAsync();
-            
+
             var topics = busTopics.Select(t => t.Path).ToList();
 
             return topics;
@@ -92,7 +94,7 @@ namespace MessageReplay.Api.Helpers
         /// <param name="content"></param>
         public async Task SendMessageAsync(string connectionString, string topicPath, string content)
         {
-            var message = new AzureMessage {Body = Encoding.UTF8.GetBytes(content)};
+            var message = new AzureMessage { Body = Encoding.UTF8.GetBytes(content) };
             await SendMessageAsync(connectionString, topicPath, message);
         }
 
@@ -170,30 +172,58 @@ namespace MessageReplay.Api.Helpers
             return purgedCount;
         }
 
-        public async Task<bool> DeleteSelectedDlqMessages(string connectionString, string topicPath,
-            string subscriptionPath, string [] messageIds)
+        public async Task<Result<DeleteSelectedDlqMessagesDto>> DeleteSelectedDlqMessages(string connectionString, string topicPath,
+            string subscriptionPath, string[] messageIds)
         {
-            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
-            var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
+            try
+            {
+                var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+                var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
 
-            var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
-            var messages = await receiver.ReceiveAsync(_maxMessageCount);
-            if (messages == null || messages.Count == 0)
-            {
-                return false;
-            }
-            
-            foreach (string msgId in messageIds)
-            {
-                var azureMessage = messages.FirstOrDefault(m => m.MessageId.Equals(msgId));
-                if (azureMessage != null)
+                var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
+                var messages = await receiver.ReceiveAsync(_maxMessageCount);
+                if (messages == null || messages.Count == 0)
                 {
-                    await receiver.CompleteAsync(azureMessage.SystemProperties.LockToken);
+                    return Result<DeleteSelectedDlqMessagesDto>.Fail(
+                        new Error
+                        {
+                            Message = "Messages not received for settlement"
+                        });
                 }
+
+                var lockedUntilUtc = messages.First().SystemProperties.LockedUntilUtc;
+                var failedMessageIds = new List<string>();
+                foreach (string msgId in messageIds)
+                {
+                    var azureMessage = messages.FirstOrDefault(m => m.MessageId.Equals(msgId));
+                    if (azureMessage != null)
+                    {
+                        await receiver.CompleteAsync(azureMessage.SystemProperties.LockToken);
+                        continue;
+                    }
+
+                    failedMessageIds.Add(msgId);
+
+                }
+
+                await receiver.CloseAsync();
+                return Result<DeleteSelectedDlqMessagesDto>.Ok(
+                        new DeleteSelectedDlqMessagesDto
+                        {
+                            LockedUntilUtc = lockedUntilUtc,
+                            FailedMessageIds = failedMessageIds
+                        });
+
             }
-           
-            await receiver.CloseAsync();
-            return true;
+            catch (Exception ex)
+            {
+                return Result<DeleteSelectedDlqMessagesDto>.Fail(
+                      new Error
+                      {
+                          Message = ex.Message
+                      });
+            }
+
         }
 
         private async Task<AzureMessage> PeekDlqMessageBySequenceNumber(string connectionString, string topicPath,
@@ -205,7 +235,7 @@ namespace MessageReplay.Api.Helpers
             var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
             var azureMessage = await receiver.PeekBySequenceNumberAsync(sequenceNumber);
             await receiver.CloseAsync();
-            
+
             return azureMessage;
         }
 
@@ -247,7 +277,7 @@ namespace MessageReplay.Api.Helpers
             await receiver.CloseAsync();
         }
 
-        
+
     }
 
     public interface ITopicHelper
@@ -267,7 +297,7 @@ namespace MessageReplay.Api.Helpers
             Message message);
         public Task DeadletterMessageAsync(string connectionString, string topicPath, string subscriptionPath,
             Message message);
-        public Task<bool> DeleteSelectedDlqMessages(string connectionString, string topicPath,
+        public Task<Result<DeleteSelectedDlqMessagesDto>> DeleteSelectedDlqMessages(string connectionString, string topicPath,
             string subscriptionPath, string[] messageIds);
     }
 }

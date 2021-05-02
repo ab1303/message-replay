@@ -15,3 +15,12 @@ export type SubscriptionDeadLettersQueryResponsePayload = {
 export type DeleteSelectedFormData = {
   messageIds: string[];
 };
+
+export type SettingsMutationResponsePayload = {
+  data: DeleteSelectedDlqMessagesResponse;
+};
+
+export type DeleteSelectedDlqMessagesResponse = {
+  failedMessageIds: string[];
+  lockedUntilUtc: string;
+};

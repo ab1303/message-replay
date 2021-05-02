@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   CellProps,
@@ -20,6 +20,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Tooltip,
   useDisclosure,
 } from '@chakra-ui/core';
 
@@ -68,7 +69,27 @@ const selectionHook = (hooks: Hooks<any>) => {
 };
 
 const SubscriptionDeadLetters: React.FC = () => {
+  const [
+    deleteSelectedLockedUntilUtc,
+    setDeleteSelectedLockedUntilUtc,
+  ] = useState<number | null>(null);
+
   const [modalRowIndex, setModalRowIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!deleteSelectedLockedUntilUtc) return;
+
+    const interval = window.setInterval(() => {
+      if (Date.now() > deleteSelectedLockedUntilUtc) {
+        setDeleteSelectedLockedUntilUtc(null);
+      }
+    }, 1000);
+    return () => {
+      console.log('Timer cleared');
+      window.clearInterval(interval);
+    };
+  }, [deleteSelectedLockedUntilUtc]);
+
   const { topic, subscription } = useParams<{
     topic: string;
     subscription: string;
@@ -167,13 +188,20 @@ const SubscriptionDeadLetters: React.FC = () => {
           //   },
           //   type: SettingsEvent.CONNECTION_CHANGED,
           // });
+          console.log('response on success', result);
+          setDeleteSelectedLockedUntilUtc(
+            Date.parse(result.data.lockedUntilUtc),
+          );
           refetch();
           console.log('messages purged successfully, result:', result);
         },
       },
     );
-    console.log('selected Flat Rows', messageIds);
   };
+
+  const disableDeleteSelected =
+    deleteSelectedLockedUntilUtc != null &&
+    deleteSelectedLockedUntilUtc > Date.now();
 
   return (
     /* eslint-disable react/jsx-key */
@@ -187,8 +215,28 @@ const SubscriptionDeadLetters: React.FC = () => {
             </MenuButton>
             <MenuList>
               <MenuItem>Delete all</MenuItem>
-              <MenuItem onClick={deleteSelectedHandler}>
+              <MenuItem
+                isDisabled={disableDeleteSelected}
+                onClick={deleteSelectedHandler}
+              >
                 Delete selected
+                {disableDeleteSelected && (
+                  <span
+                    style={{
+                      marginLeft: '5px',
+                      marginBottom: '5px',
+                    }}
+                  >
+                    <Tooltip
+                      zIndex={2}
+                      aria-label="Warning"
+                      label="Please try deleting individual messages after few seconds"
+                      placement="right"
+                    >
+                      <Icon size="5" color="yellow.600" name="warning" />
+                    </Tooltip>
+                  </span>
+                )}
               </MenuItem>
               <MenuItem>Resubmit all to Topic</MenuItem>
               <MenuItem>Resubmit selected to Topic</MenuItem>

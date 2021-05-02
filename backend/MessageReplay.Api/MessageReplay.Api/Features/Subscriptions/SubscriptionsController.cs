@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MessageReplay.Api.Features.Subscriptions.Requests;
+using MessageReplay.Api.Features.Subscriptions.Responses;
+using System.Net;
 
 namespace MessageReplay.Api.Features.Subscriptions
 {
@@ -99,22 +101,17 @@ namespace MessageReplay.Api.Features.Subscriptions
             string subscriptionName,
             [FromBody] DeleteSelectedDeadLettersRequest request)
         {
-            try
-            {
-                var result = await _topicHelper.DeleteSelectedDlqMessages(
-                    _connectionString,
-                    topicName,
-                    subscriptionName,
-                    request.MessageIds);
 
-                if (result)
-                    return NoContent();
-                else return BadRequest();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var result = await _topicHelper.DeleteSelectedDlqMessages(
+                _connectionString,
+                topicName,
+                subscriptionName,
+                request.MessageIds);
+
+            if (result.IsSuccess)
+                return Ok(_mapper.Map<DeleteSelectedDlqMessagesResponse>(result.Model));
+
+            return StatusCode((int)HttpStatusCode.InternalServerError, result.Error);
         }
 
         [HttpDelete("{subscriptionName}/deadletters", Name = "DeleteAllSubscriptionDeadLetters")]

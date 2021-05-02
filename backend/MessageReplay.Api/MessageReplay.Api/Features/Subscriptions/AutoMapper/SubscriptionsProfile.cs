@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using MessageReplay.Api.Dto;
+using MessageReplay.Api.Features.Subscriptions.Responses;
 using MessageReplay.Api.Features.Topics.Responses;
 using MessageReplay.Api.Models;
 
@@ -10,6 +12,7 @@ namespace MessageReplay.Api.Features.Subscriptions.AutoMapper
         {
             CreateMap<Message, GetSubscriptionMessage>();
             CreateMap<Message, GetSubscriptionDeadLetter>();
+            CreateMap<DeleteSelectedDlqMessagesDto, DeleteSelectedDlqMessagesResponse>();
         }
     }
 }

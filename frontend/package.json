@@ -5,6 +5,7 @@
   "devDependencies": {
     "@hookform/devtools": "2.2.1",
     "@types/dateformat": "^3.0.1",
+    "@types/node": "^15.0.1",
     "@types/react-router-dom": "^5.1.2",
     "@types/react-table": "^7.0.29",
     "@typescript-eslint/eslint-plugin": "^2.6.1",
@@ -19,7 +20,6 @@
     "@emotion/core": "^10.0.22",
     "@emotion/styled": "^10.0.23",
     "@types/jest": "24.0.22",
-    "@types/node": "12.12.6",
     "@types/react": "16.9.11",
     "@types/react-dom": "16.9.4",
     "axios": "^0.21.1",
