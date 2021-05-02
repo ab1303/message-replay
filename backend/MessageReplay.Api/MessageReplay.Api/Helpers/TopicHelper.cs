@@ -170,7 +170,7 @@ namespace MessageReplay.Api.Helpers
             return purgedCount;
         }
 
-        public async Task<bool> PurgeDlqMessagesBySequenceNumbers(string connectionString, string topicPath,
+        public async Task<bool> DeleteSelectedDlqMessages(string connectionString, string topicPath,
             string subscriptionPath, string [] messageIds)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
@@ -267,7 +267,7 @@ namespace MessageReplay.Api.Helpers
             Message message);
         public Task DeadletterMessageAsync(string connectionString, string topicPath, string subscriptionPath,
             Message message);
-        public Task<bool> PurgeDlqMessagesBySequenceNumbers(string connectionString, string topicPath,
+        public Task<bool> DeleteSelectedDlqMessages(string connectionString, string topicPath,
             string subscriptionPath, string[] messageIds);
     }
 }

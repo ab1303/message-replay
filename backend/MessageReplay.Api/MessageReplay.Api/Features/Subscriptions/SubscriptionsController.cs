@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MessageReplay.Api.Features.Subscriptions.Requests;
 
 namespace MessageReplay.Api.Features.Subscriptions
 {
@@ -85,19 +86,27 @@ namespace MessageReplay.Api.Features.Subscriptions
 
 
         [HttpGet("{subscriptionName}/deadletters/resubmit/status/{processId}", Name = "ResubmitStatus")]
-        public async Task<IActionResult> GetStatus(string topicName, string subscriptionName,Guid processId)
+        public async Task<IActionResult> GetStatus(string topicName, string subscriptionName, Guid processId)
         {
-            var result = await _replayMessageService.GetStatus(topicName,subscriptionName);
+            var result = await _replayMessageService.GetStatus(topicName, subscriptionName);
             return Ok(result);
         }
 
-        [HttpPost("{subscriptionName}/deadletters/purgeselected", Name = "PurgeSelectedSubscriptionDeadLetters")]
+        [HttpPost("{subscriptionName}/deadletters/delete", Name = "DeleteSelectedDeadLetters")]
 
-        public async Task<IActionResult> PurgeSelectedSubscriptionDeadLetters(string topicName, string subscriptionName, [FromBody] string [] messageIds)
+        public async Task<IActionResult> DeleteSelectedDeadLetters(
+            string topicName,
+            string subscriptionName,
+            [FromBody] DeleteSelectedDeadLettersRequest request)
         {
             try
             {
-                var result = await _topicHelper.PurgeDlqMessagesBySequenceNumbers(_connectionString, topicName, subscriptionName, messageIds);
+                var result = await _topicHelper.DeleteSelectedDlqMessages(
+                    _connectionString,
+                    topicName,
+                    subscriptionName,
+                    request.MessageIds);
+
                 if (result)
                     return NoContent();
                 else return BadRequest();
@@ -108,9 +117,9 @@ namespace MessageReplay.Api.Features.Subscriptions
             }
         }
 
-        [HttpDelete("{subscriptionName}/deadletters", Name = "PurgeAllSubscriptionDeadLetters")]
+        [HttpDelete("{subscriptionName}/deadletters", Name = "DeleteAllSubscriptionDeadLetters")]
 
-        public async Task<IActionResult> PurgeAllSubscriptionDeadLetters(string topicName, string subscriptionName, [FromBody] long[] sequenceNo)
+        public async Task<IActionResult> DeleteAllSubscriptionDeadLetters(string topicName, string subscriptionName, [FromBody] long[] sequenceNo)
         {
             try
             {

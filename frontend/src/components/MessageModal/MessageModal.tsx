@@ -48,7 +48,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
                     <Table.TBody.TR key={prop}>
                       <Table.TBody.TD>{prop}</Table.TBody.TD>
                       <Table.TBody.TD>
-                        {prop == 'content' ? (
+                        {prop === 'content' ? (
                           <JSONPretty
                             id="json-pretty"
                             data={message.content}

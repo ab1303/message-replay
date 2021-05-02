@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Subscriptions\Requests\" />
     <Folder Include="Features\Topics\Requests\" />
   </ItemGroup>
 

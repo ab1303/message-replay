@@ -21,6 +21,9 @@ export const useSubscriptionDeadLettersQuery = (
       );
       return response.data;
     },
+    {
+      refetchOnWindowFocus: false,
+    },
   );
 
   return query;

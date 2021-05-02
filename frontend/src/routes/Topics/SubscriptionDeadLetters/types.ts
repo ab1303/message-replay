@@ -11,3 +11,7 @@ export type SubscriptionDeadLettersQueryResponse = {
 export type SubscriptionDeadLettersQueryResponsePayload = {
   deadLetters: SubscriptionDeadLettersQueryResponse[];
 };
+
+export type DeleteSelectedFormData = {
+  messageIds: string[];
+};

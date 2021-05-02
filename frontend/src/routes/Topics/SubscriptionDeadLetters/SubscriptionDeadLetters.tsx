@@ -33,6 +33,7 @@ import {
 
 import { SubscriptionDeadLettersQueryResponse } from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
+import { useDeleteSelectedMutation } from './useDeleteSelectedMutation';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -72,13 +73,16 @@ const SubscriptionDeadLetters: React.FC = () => {
     topic: string;
     subscription: string;
   }>();
-  const { data, isFetched, isFetching } = useSubscriptionDeadLettersQuery(
-    topic,
-    subscription,
-  );
+  const {
+    data,
+    isFetched,
+    isFetching,
+    refetch,
+  } = useSubscriptionDeadLettersQuery(topic, subscription);
+
+  const deleteSelectedMutation = useDeleteSelectedMutation(topic, subscription);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   const columns = React.useMemo<Column<SubscriptionDeadLettersQueryResponse>[]>(
     () => [
       {
@@ -102,7 +106,6 @@ const SubscriptionDeadLetters: React.FC = () => {
                 setModalRowIndex(index);
                 onOpen();
               }}
-              // onClick={onOpen}
               name="email"
             />
           );
@@ -126,7 +129,7 @@ const SubscriptionDeadLetters: React.FC = () => {
 
   const tableData = React.useMemo<SubscriptionDeadLettersQueryResponse[]>(
     () => (data ? data.deadLetters : []),
-    [isFetched],
+    [data],
   );
 
   const hooks = [useRowSelect, selectionHook];
@@ -145,7 +148,33 @@ const SubscriptionDeadLetters: React.FC = () => {
     ...hooks,
   );
 
-  console.log('selected Flat Rows', selectedFlatRows);
+  const deleteSelectedHandler = () => {
+    const messageIds = selectedFlatRows.map(sfr => sfr.original.messageId);
+    deleteSelectedMutation.mutate(
+      {
+        messageIds,
+      },
+      {
+        onSuccess: result => {
+          // reset({
+          //   connectionString: formData.connectionString,
+          // });
+          // appDispatch({
+          //   payload: {
+          //     connectionString: formData.connectionString,
+          //     queues: result.data.queues,
+          //     topics: result.data.topics,
+          //   },
+          //   type: SettingsEvent.CONNECTION_CHANGED,
+          // });
+          refetch();
+          console.log('messages purged successfully, result:', result);
+        },
+      },
+    );
+    console.log('selected Flat Rows', messageIds);
+  };
+
   return (
     /* eslint-disable react/jsx-key */
     <Card>
@@ -157,8 +186,10 @@ const SubscriptionDeadLetters: React.FC = () => {
               <MdMoreVert />
             </MenuButton>
             <MenuList>
-              <MenuItem>Purge all</MenuItem>
-              <MenuItem>Purge selected</MenuItem>
+              <MenuItem>Delete all</MenuItem>
+              <MenuItem onClick={deleteSelectedHandler}>
+                Delete selected
+              </MenuItem>
               <MenuItem>Resubmit all to Topic</MenuItem>
               <MenuItem>Resubmit selected to Topic</MenuItem>
             </MenuList>
