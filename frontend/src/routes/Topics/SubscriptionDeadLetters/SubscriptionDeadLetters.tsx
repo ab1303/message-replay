@@ -259,7 +259,7 @@ const SubscriptionDeadLetters: React.FC = () => {
           </Table.THead>
           <Table.TBody {...getTableBodyProps()}>
             {isFetching ? (
-              <TableDataLoadingSpinner />
+              <TableDataLoadingSpinner columnsCount={columns.length + 1} />
             ) : (
               rows.map(row => {
                 prepareRow(row);

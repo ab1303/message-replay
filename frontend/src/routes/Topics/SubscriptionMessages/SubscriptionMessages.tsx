@@ -32,38 +32,6 @@ import {
 import { SubscriptionMessagesQueryResponse } from './types';
 import { useSubscriptionMessagesQuery } from './useSubscriptionMessagesQuery';
 
-const selectionHook = (hooks: Hooks<any>) => {
-  hooks.visibleColumns.push(columns => [
-    // Let's make a column for selection
-    {
-      id: '_selector',
-      disableResizing: true,
-      disableGroupBy: true,
-      minWidth: 45,
-      width: 45,
-      maxWidth: 45,
-      // The header can use the table's getToggleAllRowsSelectedProps method
-      // to render a checkbox
-      Header: ({ getToggleAllRowsSelectedProps }: HeaderProps<any>) => (
-        // @ts-ignore
-        <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
-      ),
-      // The cell can use the individual row's getToggleRowSelectedProps method
-      // to the render a checkbox
-      Cell: ({ row }: CellProps<any>) => (
-        // @ts-ignore
-        <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-      ),
-    },
-    ...columns,
-  ]);
-  hooks.useInstanceBeforeDimensions.push(({ headerGroups }) => {
-    // fix the parent group of the selection button to not be resizable
-    const selectionGroupHeader = headerGroups[0].headers[0];
-    selectionGroupHeader.canResize = false;
-  });
-};
-
 const SubscriptionMessages: React.FC = () => {
   const [modalRowIndex, setModalRowIndex] = useState<number | null>(null);
   const { topic, subscription } = useParams<{
@@ -114,13 +82,12 @@ const SubscriptionMessages: React.FC = () => {
     [isFetched],
   );
 
-  const hooks = [useRowSelect, selectionHook];
+  const hooks = [useRowSelect];
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
-    selectedFlatRows,
     prepareRow,
   } = useTable<SubscriptionMessagesQueryResponse>(
     {
@@ -134,18 +101,7 @@ const SubscriptionMessages: React.FC = () => {
     <Card>
       <Card.Header>
         <Flex textAlign="right" justify="space-between">
-          <Card.Header.Title>Subscription Dead Letters</Card.Header.Title>
-          <Menu>
-            <MenuButton as={Button}>
-              <MdMoreVert />
-            </MenuButton>
-            <MenuList>
-              <MenuItem>Delete all</MenuItem>
-              <MenuItem>Delete selected</MenuItem>
-              <MenuItem>Send all to DeadLetter</MenuItem>
-              <MenuItem>Send selected to DeadLetter</MenuItem>
-            </MenuList>
-          </Menu>
+          <Card.Header.Title>Subscription Active Messages</Card.Header.Title>
         </Flex>
       </Card.Header>
       <Card.Body>

@@ -3,28 +3,24 @@ import { useMutation } from 'react-query';
 import axios from 'axios';
 import { AppConfigurations } from 'src/types';
 import { ConfigContext } from 'src/providers/ConfigProvider';
-import {
-  DeleteSelectedDlqMessagesResponsePayload,
-  DeleteSelectedFormData,
-} from './types';
+import { ResubmitDlqMessagesResponsePayload } from './types';
 
-export const useDeleteSelectedMutation = (
+export const useResubmitAllMutation = (
   topicName: string,
   subscriptionName: string,
 ) => {
   const config = useContext<AppConfigurations>(ConfigContext);
 
   const mutation = useMutation<
-    DeleteSelectedDlqMessagesResponsePayload,
+    ResubmitDlqMessagesResponsePayload,
     unknown,
-    DeleteSelectedFormData
-  >(formData =>
+    void
+  >(() =>
     axios.post(
-      `${config.apiEndpoint}/servicebus/topics/${topicName}/subscriptions/${subscriptionName}/deadletters/delete`,
+      `${config.apiEndpoint}/servicebus/topics/${topicName}/subscriptions/${subscriptionName}/deadletters/Resubmit`,
       {
         topicName,
         subscriptionName,
-        messageIds: formData.messageIds,
       },
     ),
   );

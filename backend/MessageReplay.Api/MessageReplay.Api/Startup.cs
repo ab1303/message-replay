@@ -64,7 +64,7 @@ namespace MessageReplay.Api
                 .AddScoped<IQueueHelper, QueueHelper>()
                 .AddScoped<ITopicHelper, TopicHelper>()
                 .AddSingleton<ReplayMessageService>()
-                .AddSingleton<UnitOfWorkTopic>();
+                .AddSingleton<TopicProcessor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

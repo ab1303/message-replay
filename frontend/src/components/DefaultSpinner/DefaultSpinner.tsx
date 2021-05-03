@@ -5,7 +5,9 @@ type DefaultSpinnerProps = Pick<ISpinnerProps, 'size' | 'color'> & {
   thickness?: string | undefined;
 };
 
-type TableDataLoadingSpinnerProps = DefaultSpinnerProps & {};
+type TableDataLoadingSpinnerProps = DefaultSpinnerProps & {
+  columnsCount: number;
+};
 
 const DefaultSpinner: React.FC<DefaultSpinnerProps> = ({
   thickness = '4px',
@@ -19,16 +21,18 @@ export const TableDataLoadingSpinner: React.FC<TableDataLoadingSpinnerProps> = (
   thickness = '4px',
   size = 'lg',
   color = 'teal.500',
+  columnsCount,
 }) => (
-  <Flex as="tr" align="center" justify="center" w="100%" h="100px">
-    <Spinner
-      as="td"
-      thickness={thickness}
-      size={size}
-      color={color}
-      emptyColor="gray.200"
-    />
-  </Flex>
+  <tr>
+    <td colSpan={columnsCount} style={{ textAlign: 'center', height: '50px' }}>
+      <Spinner
+        thickness={thickness}
+        size={size}
+        color={color}
+        emptyColor="gray.200"
+      />
+    </td>
+  </tr>
 );
 
 TableDataLoadingSpinner.displayName = 'TableDataLoadingSpinner';

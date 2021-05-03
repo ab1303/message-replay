@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using MessageReplay.Api.Features.Topics.Responses;
 using MessageReplay.Api.Helpers;
@@ -19,24 +18,23 @@ namespace MessageReplay.Api.Common
 
     public class ReplayMessageService
     {
-        private readonly UnitOfWorkTopic _unitOfWorkTopic;
+        private readonly TopicProcessor _topicProcessor;
 
-        public ReplayMessageService(UnitOfWorkTopic unitOfWorkTopic)
+        public ReplayMessageService(TopicProcessor topicProcessor)
         {
-            _unitOfWorkTopic = unitOfWorkTopic;
+            _topicProcessor = topicProcessor;
         }
 
         public async Task<ReplayMessagesLongRunningProcess> StartReplayingMessages(string connectionString,
             string topicName, string subscriptionName)
         {
-            var processId = Guid.NewGuid();
-            _unitOfWorkTopic.StartResubmitting(connectionString, topicName, subscriptionName);
-            return await _unitOfWorkTopic.GetStatus(topicName,subscriptionName);
+            // _topicProcessor.StartResubmitting(connectionString, topicName, subscriptionName);
+            return await _topicProcessor.GetStatus(topicName,subscriptionName);
         }
 
         public async Task<ReplayMessagesLongRunningProcess> GetStatus(string topicName, string subscriptionName)
         {
-            return await _unitOfWorkTopic.GetStatus(topicName,subscriptionName);
+            return await _topicProcessor.GetStatus(topicName,subscriptionName);
         }
     }
 }

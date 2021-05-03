@@ -1,4 +1,4 @@
-import { Tab, TabList, TabPanels, Tabs } from '@chakra-ui/core';
+import { Heading, Stack, Tab, TabList, TabPanels, Tabs } from '@chakra-ui/core';
 import React from 'react';
 import { NavLink, useRouteMatch, Route, Switch } from 'react-router-dom';
 import { useAppState } from 'src/providers/AppStateProvider';
@@ -16,30 +16,35 @@ const SubscriptionList: React.FC = () => {
 
   return (
     // @ts-ignore
-    <Tabs defaultIndex={tabDefaultIndex}>
-      <TabList>
-        <Tab>
-          <NavLink to={`${match.url}/messages`}>
-            Messages - ({selectedSubscription.activeMessageCount})
-          </NavLink>
-        </Tab>
-        <Tab>
-          <NavLink to={`${match.url}/deadletters`}>
-            Dead Letters - ({selectedSubscription.deadLetterMessageCount})
-          </NavLink>
-        </Tab>
-      </TabList>
-      <TabPanels>
-        <Switch>
-          <Route path={`${match.path}/messages`}>
-            <SubscriptionMessages />
-          </Route>
-          <Route path={`${match.path}/deadletters`}>
-            <SubscriptionDeadLetters />
-          </Route>
-        </Switch>
-      </TabPanels>
-    </Tabs>
+    <Stack spacing={3}>
+      <Heading as="h2" size="lg" color="blue.600">
+        {selectedSubscription.name}
+      </Heading>
+      <Tabs defaultIndex={tabDefaultIndex}>
+        <TabList>
+          <Tab>
+            <NavLink to={`${match.url}/messages`}>
+              Messages - ({selectedSubscription.activeMessageCount})
+            </NavLink>
+          </Tab>
+          <Tab>
+            <NavLink to={`${match.url}/deadletters`}>
+              Dead Letters - ({selectedSubscription.deadLetterMessageCount})
+            </NavLink>
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <Switch>
+            <Route path={`${match.path}/messages`}>
+              <SubscriptionMessages />
+            </Route>
+            <Route path={`${match.path}/deadletters`}>
+              <SubscriptionDeadLetters />
+            </Route>
+          </Switch>
+        </TabPanels>
+      </Tabs>
+    </Stack>
   );
 };
 

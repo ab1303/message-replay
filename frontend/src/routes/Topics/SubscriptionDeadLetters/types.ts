@@ -16,11 +16,28 @@ export type DeleteSelectedFormData = {
   messageIds: string[];
 };
 
-export type SettingsMutationResponsePayload = {
+export type DeleteSelectedDlqMessagesResponsePayload = {
   data: DeleteSelectedDlqMessagesResponse;
 };
 
 export type DeleteSelectedDlqMessagesResponse = {
   failedMessageIds: string[];
   lockedUntilUtc: string;
+};
+
+export type ResubmitDlqMessagesResponsePayload = {
+  data: ResubmitDlqMessagesResponse;
+};
+
+export type ResubmitDlqMessagesResponse = {
+  processId: string;
+  callBackAfter: string;
+  inProgress: boolean;
+  subscription: {
+    name: string;
+    activeMessageCount: number;
+    deadLetterMessageCount: number;
+    createdAt: string;
+  };
+  callBackUrl: string;
 };

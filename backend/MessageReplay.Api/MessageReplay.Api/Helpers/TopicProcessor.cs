@@ -9,14 +9,14 @@ using AzureMessage = Microsoft.Azure.ServiceBus.Message;
 
 namespace MessageReplay.Api.Helpers
 {
-    public class UnitOfWorkTopic : IDisposable
+    public class TopicProcessor : IDisposable
     {
         private int _maxMessageCount = 100;
         private MessageReceiver _receiver;
         private TopicClient _topicClient;
         ReplayMessagesLongRunningProcess _replayMessagesLongRunningProcess;
 
-        public UnitOfWorkTopic()
+        public TopicProcessor()
         {
             _replayMessagesLongRunningProcess = new ReplayMessagesLongRunningProcess();
 
