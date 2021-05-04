@@ -21,7 +21,6 @@ import {
   MenuItem,
   MenuList,
   Tooltip,
-  useDisclosure,
 } from '@chakra-ui/core';
 
 import {
@@ -32,9 +31,14 @@ import {
   MessageModal,
 } from 'src/components';
 
-import { SubscriptionDeadLettersQueryResponse } from './types';
+import {
+  ResubmitDlqMessagesResponse,
+  SubscriptionDeadLettersQueryResponse,
+} from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
 import { useDeleteSelectedMutation } from './useDeleteSelectedMutation';
+import ResubmitStatusModal from 'src/components/ResubmitStatusModal';
+import { useResubmitAllMutation } from './useResubmitAllMutation';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -73,8 +77,24 @@ const SubscriptionDeadLetters: React.FC = () => {
     deleteSelectedLockedUntilUtc,
     setDeleteSelectedLockedUntilUtc,
   ] = useState<number | null>(null);
+  const [rowIndex, setRowIndex] = useState<number | null>(null);
+  const [openMessageModal, setOpenMessageModal] = useState<boolean>(false);
+  const [showTableLoading, setShowTableLoading] = useState<boolean>(false);
 
-  const [modalRowIndex, setModalRowIndex] = useState<number | null>(null);
+  const [resubmitAllState, setResubmitAllState] = useState<{
+    showModal: boolean;
+    response: ResubmitDlqMessagesResponse | null;
+  }>({ showModal: false, response: null });
+
+  const { topic, subscription } = useParams<{
+    topic: string;
+    subscription: string;
+  }>();
+
+  const { data, isFetching, refetch } = useSubscriptionDeadLettersQuery(
+    topic,
+    subscription,
+  );
 
   useEffect(() => {
     if (!deleteSelectedLockedUntilUtc) return;
@@ -90,20 +110,19 @@ const SubscriptionDeadLetters: React.FC = () => {
     };
   }, [deleteSelectedLockedUntilUtc]);
 
-  const { topic, subscription } = useParams<{
-    topic: string;
-    subscription: string;
-  }>();
-  const {
-    data,
-    isFetched,
-    isFetching,
-    refetch,
-  } = useSubscriptionDeadLettersQuery(topic, subscription);
+  useEffect(() => {
+    if (isFetching || resubmitAllState.showModal) {
+      setShowTableLoading(true);
+      return;
+    }
+
+    setShowTableLoading(false);
+  }, [isFetching, resubmitAllState]);
 
   const deleteSelectedMutation = useDeleteSelectedMutation(topic, subscription);
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const resubmitAllMutation = useResubmitAllMutation(topic, subscription);
+
   const columns = React.useMemo<Column<SubscriptionDeadLettersQueryResponse>[]>(
     () => [
       {
@@ -124,8 +143,8 @@ const SubscriptionDeadLetters: React.FC = () => {
             <Icon
               style={{ cursor: 'hand' }}
               onClick={() => {
-                setModalRowIndex(index);
-                onOpen();
+                setRowIndex(index);
+                setOpenMessageModal(true);
               }}
               name="email"
             />
@@ -169,6 +188,10 @@ const SubscriptionDeadLetters: React.FC = () => {
     ...hooks,
   );
 
+  const disableDeleteSelected =
+    deleteSelectedLockedUntilUtc != null &&
+    deleteSelectedLockedUntilUtc > Date.now();
+
   const deleteSelectedHandler = () => {
     const messageIds = selectedFlatRows.map(sfr => sfr.original.messageId);
     deleteSelectedMutation.mutate(
@@ -177,18 +200,6 @@ const SubscriptionDeadLetters: React.FC = () => {
       },
       {
         onSuccess: result => {
-          // reset({
-          //   connectionString: formData.connectionString,
-          // });
-          // appDispatch({
-          //   payload: {
-          //     connectionString: formData.connectionString,
-          //     queues: result.data.queues,
-          //     topics: result.data.topics,
-          //   },
-          //   type: SettingsEvent.CONNECTION_CHANGED,
-          // });
-          console.log('response on success', result);
           setDeleteSelectedLockedUntilUtc(
             Date.parse(result.data.lockedUntilUtc),
           );
@@ -199,9 +210,17 @@ const SubscriptionDeadLetters: React.FC = () => {
     );
   };
 
-  const disableDeleteSelected =
-    deleteSelectedLockedUntilUtc != null &&
-    deleteSelectedLockedUntilUtc > Date.now();
+  const resubmitAllHandler = () => {
+    resubmitAllMutation.mutate(null, {
+      onSuccess: result => {
+        setResubmitAllState({
+          showModal: true,
+          response: result.data,
+        });
+        console.log('resubmitAll result:', result);
+      },
+    });
+  };
 
   return (
     /* eslint-disable react/jsx-key */
@@ -238,7 +257,9 @@ const SubscriptionDeadLetters: React.FC = () => {
                   </span>
                 )}
               </MenuItem>
-              <MenuItem>Resubmit all to Topic</MenuItem>
+              <MenuItem onClick={resubmitAllHandler}>
+                Resubmit all to Topic
+              </MenuItem>
               <MenuItem>Resubmit selected to Topic</MenuItem>
             </MenuList>
           </Menu>
@@ -258,7 +279,7 @@ const SubscriptionDeadLetters: React.FC = () => {
             ))}
           </Table.THead>
           <Table.TBody {...getTableBodyProps()}>
-            {isFetching ? (
+            {showTableLoading ? (
               <TableDataLoadingSpinner columnsCount={columns.length + 1} />
             ) : (
               rows.map(row => {
@@ -280,11 +301,24 @@ const SubscriptionDeadLetters: React.FC = () => {
         </Table>
 
         <MessageModal
-          isOpen={isOpen}
-          onClose={onClose}
-          message={modalRowIndex != null ? tableData[modalRowIndex] : null}
+          openMessageModal={openMessageModal}
+          closeMessageModal={() => setOpenMessageModal(false)}
+          message={rowIndex != null ? tableData[rowIndex] : null}
           displayProps={['messageId', 'content']}
         />
+
+        {resubmitAllState.response && (
+          <ResubmitStatusModal
+            modalState={resubmitAllState.response}
+            openResubmitStatusModal={resubmitAllState.showModal}
+            closeResubmitStatusModal={() =>
+              setResubmitAllState({
+                showModal: false,
+                response: null,
+              })
+            }
+          />
+        )}
       </Card.Body>
     </Card>
   );

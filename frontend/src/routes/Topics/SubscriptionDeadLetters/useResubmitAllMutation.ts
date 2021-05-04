@@ -14,7 +14,7 @@ export const useResubmitAllMutation = (
   const mutation = useMutation<
     ResubmitDlqMessagesResponsePayload,
     unknown,
-    void
+    null
   >(() =>
     axios.post(
       `${config.apiEndpoint}/servicebus/topics/${topicName}/subscriptions/${subscriptionName}/deadletters/Resubmit`,

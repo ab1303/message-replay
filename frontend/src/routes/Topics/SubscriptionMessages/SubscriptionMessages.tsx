@@ -1,34 +1,11 @@
 /* eslint-disable react/display-name */
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  CellProps,
-  Column,
-  HeaderProps,
-  Hooks,
-  useRowSelect,
-  useTable,
-} from 'react-table';
+import { CellProps, Column, useRowSelect, useTable } from 'react-table';
 
-import { MdMoreVert } from 'react-icons/md';
+import { Flex, Icon } from '@chakra-ui/core';
 
-import {
-  Button,
-  Flex,
-  Icon,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  useDisclosure,
-} from '@chakra-ui/core';
-
-import {
-  Card,
-  Table,
-  IndeterminateCheckbox,
-  MessageModal,
-} from 'src/components';
+import { Card, Table, MessageModal } from 'src/components';
 import { SubscriptionMessagesQueryResponse } from './types';
 import { useSubscriptionMessagesQuery } from './useSubscriptionMessagesQuery';
 
@@ -39,7 +16,7 @@ const SubscriptionMessages: React.FC = () => {
     subscription: string;
   }>();
   const { data, isFetched } = useSubscriptionMessagesQuery(topic, subscription);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [openMessageModal, setOpenMessageModal] = useState<boolean>(false);
   const columns = React.useMemo<Column<SubscriptionMessagesQueryResponse>[]>(
     () => [
       {
@@ -61,7 +38,7 @@ const SubscriptionMessages: React.FC = () => {
               style={{ cursor: 'hand' }}
               onClick={() => {
                 setModalRowIndex(index);
-                onOpen();
+                setOpenMessageModal(true);
               }}
               // onClick={onOpen}
               name="email"
@@ -136,8 +113,8 @@ const SubscriptionMessages: React.FC = () => {
         </Table>
 
         <MessageModal
-          isOpen={isOpen}
-          onClose={onClose}
+          openMessageModal={openMessageModal}
+          closeMessageModal={() => setOpenMessageModal(false)}
           message={modalRowIndex != null ? tableData[modalRowIndex] : null}
           displayProps={['messageId', 'content']}
         />

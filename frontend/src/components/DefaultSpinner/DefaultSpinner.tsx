@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, ISpinnerProps, Spinner } from '@chakra-ui/core';
+import { ISpinnerProps, Spinner } from '@chakra-ui/core';
 
 type DefaultSpinnerProps = Pick<ISpinnerProps, 'size' | 'color'> & {
   thickness?: string | undefined;

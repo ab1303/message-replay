@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import JSONPretty from 'react-json-pretty';
 import {
   Modal,
@@ -8,7 +8,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  IModal,
+  useDisclosure,
 } from '@chakra-ui/core';
 import Card from '../Card';
 import { Table } from '..';
@@ -19,22 +19,37 @@ type responseType =
   | SubscriptionDeadLettersQueryResponse
   | SubscriptionMessagesQueryResponse;
 
-interface MessageModalProps extends Pick<IModal, 'isOpen' | 'onClose'> {
+interface MessageModalProps {
   message: responseType | null;
   displayProps: Array<keyof responseType>;
+  openMessageModal: boolean;
+  closeMessageModal: () => void;
 }
 
 const MessageModal: React.FC<MessageModalProps> = ({
-  isOpen,
-  onClose,
   message,
   displayProps,
+  openMessageModal,
+  closeMessageModal,
 }) => {
   const getMessageProp = (obj: responseType, key: keyof responseType) =>
     obj[key];
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  useEffect(() => {
+    if (openMessageModal) onOpen();
+  }, [openMessageModal]);
+
   return (
-    <Modal blockScrollOnMount isOpen={isOpen} onClose={onClose}>
+    <Modal
+      blockScrollOnMount
+      isOpen={isOpen}
+      onClose={() => {
+        closeMessageModal();
+        onClose();
+      }}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Message Payload</ModalHeader>
