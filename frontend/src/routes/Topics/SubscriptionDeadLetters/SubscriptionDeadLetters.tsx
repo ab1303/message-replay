@@ -33,11 +33,12 @@ import {
 
 import {
   ResubmitDlqMessagesResponse,
+  ResubmitDlqMessagesResponsePayload,
   SubscriptionDeadLettersQueryResponse,
 } from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
 import { useDeleteSelectedMutation } from './useDeleteSelectedMutation';
-import ResubmitStatusModal from 'src/components/ResubmitStatusModal';
+import ResubmitStatusModal from 'src/routes/Topics/SubscriptionDeadLetters/ResubmitStatusModal';
 import { useResubmitAllMutation } from './useResubmitAllMutation';
 
 const selectionHook = (hooks: Hooks<any>) => {
@@ -217,7 +218,6 @@ const SubscriptionDeadLetters: React.FC = () => {
           showModal: true,
           response: result.data,
         });
-        console.log('resubmitAll result:', result);
       },
     });
   };
@@ -309,7 +309,7 @@ const SubscriptionDeadLetters: React.FC = () => {
 
         {resubmitAllState.response && (
           <ResubmitStatusModal
-            modalState={resubmitAllState.response}
+            resubmitDlqMessagesResponse={resubmitAllState.response}
             openResubmitStatusModal={resubmitAllState.showModal}
             closeResubmitStatusModal={() =>
               setResubmitAllState({

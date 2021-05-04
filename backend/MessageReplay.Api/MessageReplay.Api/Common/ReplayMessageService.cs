@@ -13,7 +13,7 @@ namespace MessageReplay.Api.Common
         public GetTopicSubscription Subscription { get; set; }
 
         public string CallBackUrl =>
-            "/api/servicebus/topics/replay-poc-topic/Subscriptions/replay-poc-subscription/deadletters/resubmit/status/94863f3e-11c0-4026-9fd8-96b3a0c607b7";
+            $"servicebus/topics/replay-poc-topic/Subscriptions/replay-poc-subscription/deadletters/resubmit/status/{ProcessId}";
     }
 
     public class ReplayMessageService
@@ -28,13 +28,13 @@ namespace MessageReplay.Api.Common
         public async Task<ReplayMessagesLongRunningProcess> StartReplayingMessages(string connectionString,
             string topicName, string subscriptionName)
         {
-            // _topicProcessor.StartResubmitting(connectionString, topicName, subscriptionName);
-            return await _topicProcessor.GetStatus(topicName,subscriptionName);
+            _topicProcessor.StartResubmitting(connectionString, topicName, subscriptionName);
+            return await _topicProcessor.GetStatus(topicName, subscriptionName);
         }
 
         public async Task<ReplayMessagesLongRunningProcess> GetStatus(string topicName, string subscriptionName)
         {
-            return await _topicProcessor.GetStatus(topicName,subscriptionName);
+            return await _topicProcessor.GetStatus(topicName, subscriptionName);
         }
     }
 }

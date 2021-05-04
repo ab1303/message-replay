@@ -29,15 +29,21 @@ export type ResubmitDlqMessagesResponsePayload = {
   data: ResubmitDlqMessagesResponse;
 };
 
+export type ResubmitDlqMessagesStatusResponsePayload = {
+  response: ResubmitDlqMessagesResponse;
+};
+
+export type Subscription = {
+  name: string;
+  activeMessageCount: number;
+  deadLetterMessageCount: number;
+  createdAt: string;
+};
+
 export type ResubmitDlqMessagesResponse = {
   processId: string;
   callBackAfter: string;
   inProgress: boolean;
-  subscription: {
-    name: string;
-    activeMessageCount: number;
-    deadLetterMessageCount: number;
-    createdAt: string;
-  };
+  subscription: Subscription;
   callBackUrl: string;
 };
