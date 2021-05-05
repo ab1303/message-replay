@@ -14,15 +14,16 @@ import {
 } from '@chakra-ui/core';
 import { SettingsEvent, SettingsFormData } from './types';
 import { useSettingsMutation } from './useSettingsMutation';
-import { useAppDispatch } from 'src/providers/AppStateProvider';
+import { useAppDispatch, useAppState } from 'src/providers/AppStateProvider';
 import { DefaultSpinner } from 'src/components';
 
 const Settings: React.FC = () => {
   const appDispatch = useAppDispatch();
+  const appState = useAppState();
   const formMethods = useForm<SettingsFormData>({
     mode: 'onBlur',
     defaultValues: {
-      connectionString: '',
+      connectionString: appState.settings.connectionString,
     },
   });
 
