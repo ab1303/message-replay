@@ -12,7 +12,7 @@ const SubscriptionList: React.FC = () => {
   if (!match || !selectedSubscription) return null;
   const url = window.location.href;
 
-  const tabDefaultIndex = url.indexOf('deadletters') > 0 ? 1 : 0;
+  const tabIndex = url.indexOf('deadletters') > 0 ? 1 : 0;
 
   return (
     // @ts-ignore
@@ -20,7 +20,7 @@ const SubscriptionList: React.FC = () => {
       <Heading as="h2" size="lg" color="blue.600">
         {selectedSubscription.name}
       </Heading>
-      <Tabs defaultIndex={tabDefaultIndex}>
+      <Tabs index={tabIndex} isManual>
         <TabList>
           <Tab>
             <NavLink to={`${match.url}/messages`}>

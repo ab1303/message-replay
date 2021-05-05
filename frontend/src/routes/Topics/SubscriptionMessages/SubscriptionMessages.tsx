@@ -5,7 +5,12 @@ import { CellProps, Column, useRowSelect, useTable } from 'react-table';
 
 import { Flex, Icon } from '@chakra-ui/core';
 
-import { Card, Table, MessageModal } from 'src/components';
+import {
+  Card,
+  Table,
+  MessageModal,
+  TableDataLoadingSpinner,
+} from 'src/components';
 import { SubscriptionMessagesQueryResponse } from './types';
 import { useSubscriptionMessagesQuery } from './useSubscriptionMessagesQuery';
 
@@ -15,7 +20,10 @@ const SubscriptionMessages: React.FC = () => {
     topic: string;
     subscription: string;
   }>();
-  const { data, isFetched } = useSubscriptionMessagesQuery(topic, subscription);
+  const { data, isFetched, isFetching } = useSubscriptionMessagesQuery(
+    topic,
+    subscription,
+  );
   const [openMessageModal, setOpenMessageModal] = useState<boolean>(false);
   const columns = React.useMemo<Column<SubscriptionMessagesQueryResponse>[]>(
     () => [
@@ -56,7 +64,7 @@ const SubscriptionMessages: React.FC = () => {
 
   const tableData = React.useMemo<SubscriptionMessagesQueryResponse[]>(
     () => (data ? data.messages : []),
-    [isFetched],
+    [data],
   );
 
   const hooks = [useRowSelect];
@@ -95,20 +103,24 @@ const SubscriptionMessages: React.FC = () => {
             ))}
           </Table.THead>
           <Table.TBody {...getTableBodyProps()}>
-            {rows.map(row => {
-              prepareRow(row);
-              return (
-                <Table.TBody.TR {...row.getRowProps()}>
-                  {row.cells.map(cell => {
-                    return (
-                      <Table.TBody.TD {...cell.getCellProps()}>
-                        {cell.render('Cell')}
-                      </Table.TBody.TD>
-                    );
-                  })}
-                </Table.TBody.TR>
-              );
-            })}
+            {isFetching ? (
+              <TableDataLoadingSpinner columnsCount={columns.length + 1} />
+            ) : (
+              rows.map(row => {
+                prepareRow(row);
+                return (
+                  <Table.TBody.TR {...row.getRowProps()}>
+                    {row.cells.map(cell => {
+                      return (
+                        <Table.TBody.TD {...cell.getCellProps()}>
+                          {cell.render('Cell')}
+                        </Table.TBody.TD>
+                      );
+                    })}
+                  </Table.TBody.TR>
+                );
+              })
+            )}
           </Table.TBody>
         </Table>
 
