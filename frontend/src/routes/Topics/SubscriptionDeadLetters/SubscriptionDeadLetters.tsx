@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import {
   CellProps,
   Column,
@@ -34,12 +34,16 @@ import {
 
 import {
   ResubmitDlqMessagesResponse,
+  SubscriptionDeadLettersEvent,
   SubscriptionDeadLettersQueryResponse,
 } from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
 import { useDeleteSelectedMutation } from './useDeleteSelectedMutation';
 import ResubmitStatusModal from 'src/routes/Topics/SubscriptionDeadLetters/ResubmitStatusModal';
 import { useResubmitAllMutation } from './useResubmitAllMutation';
+import { useAppDispatch } from 'src/providers/AppStateProvider';
+import { Subscription } from '../SubscriptionList/types';
+import { Path } from 'src/router';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -74,6 +78,15 @@ const selectionHook = (hooks: Hooks<any>) => {
 };
 
 const SubscriptionDeadLetters: React.FC = () => {
+  const { topic, subscription } = useParams<{
+    topic: string;
+    subscription: string;
+  }>();
+  const history = useHistory();
+  const toast = useToast();
+
+  const appDispatch = useAppDispatch();
+
   const [
     deleteSelectedLockedUntilUtc,
     setDeleteSelectedLockedUntilUtc,
@@ -86,11 +99,6 @@ const SubscriptionDeadLetters: React.FC = () => {
     showModal: boolean;
     response: ResubmitDlqMessagesResponse | null;
   }>({ showModal: false, response: null });
-
-  const { topic, subscription } = useParams<{
-    topic: string;
-    subscription: string;
-  }>();
 
   const { data, isFetching, refetch } = useSubscriptionDeadLettersQuery(
     topic,
@@ -122,7 +130,6 @@ const SubscriptionDeadLetters: React.FC = () => {
 
   const deleteSelectedMutation = useDeleteSelectedMutation(topic, subscription);
   const resubmitAllMutation = useResubmitAllMutation(topic, subscription);
-  const toast = useToast();
 
   const columns = React.useMemo<Column<SubscriptionDeadLettersQueryResponse>[]>(
     () => [
@@ -319,15 +326,23 @@ const SubscriptionDeadLetters: React.FC = () => {
           <ResubmitStatusModal
             resubmitDlqMessagesResponse={resubmitAllState.response}
             openResubmitStatusModal={resubmitAllState.showModal}
-            closeResubmitStatusModal={
-              () =>
-                setResubmitAllState({
-                  showModal: false,
-                  response: null,
-                })
+            closeResubmitStatusModal={(updatedSubscription: Subscription) => {
+              setResubmitAllState({
+                showModal: false,
+                response: null,
+              });
 
-              // TODO: Route and dispatch
-            }
+              appDispatch({
+                type: SubscriptionDeadLettersEvent.RESUBMIT_ALL_PROCESSED,
+                payload: {
+                  subscription: updatedSubscription,
+                },
+              });
+
+              history.push(
+                `${Path.MESSAGE_BROKER_TOPICS}/${topic}/subscriptions/${subscription}/messages`,
+              );
+            }}
           />
         )}
       </Card.Body>

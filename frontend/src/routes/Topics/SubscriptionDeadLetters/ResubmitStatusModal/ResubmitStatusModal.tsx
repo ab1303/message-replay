@@ -20,10 +20,11 @@ import StatCard from 'src/routes/Home/components/StatCard';
 import { useResubmitStatusQuery } from './useResubmitStatusQuery';
 import { DefaultSpinner } from 'src/components';
 import { useInterval } from 'src/hooks/useInterval';
+import { Subscription } from '../../SubscriptionList/types';
 
 interface MessageModalProps {
   openResubmitStatusModal: boolean;
-  closeResubmitStatusModal: () => void;
+  closeResubmitStatusModal: (updatedSubscription: Subscription) => void;
   resubmitDlqMessagesResponse: ResubmitDlqMessagesResponse;
 }
 
@@ -65,7 +66,7 @@ const ResubmitStatusModal: React.FC<MessageModalProps> = ({
     setTimerSeconds(toSeconds(data.callBackAfter));
 
     if (!data.inProgress) {
-      closeResubmitStatusModal();
+      closeResubmitStatusModal(data.subscription);
       if (data.subscription.deadLetterMessageCount === 0) {
         toast({
           title: 'Subscription - DeadLetters.',

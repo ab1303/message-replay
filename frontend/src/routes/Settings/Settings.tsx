@@ -14,11 +14,10 @@ import {
 } from '@chakra-ui/core';
 import { SettingsEvent, SettingsFormData } from './types';
 import { useSettingsMutation } from './useSettingsMutation';
-import { useAppDispatch, useAppState } from 'src/providers/AppStateProvider';
+import { useAppDispatch } from 'src/providers/AppStateProvider';
 import { DefaultSpinner } from 'src/components';
 
 const Settings: React.FC = () => {
-  const appState = useAppState();
   const appDispatch = useAppDispatch();
   const formMethods = useForm<SettingsFormData>({
     mode: 'onBlur',

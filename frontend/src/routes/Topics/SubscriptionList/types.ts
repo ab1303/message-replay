@@ -1,9 +1,11 @@
-export type SubscriptionsQueryResponse = {
-  activeMessageCount: number;
-  createdAt: Date;
-  deadLetterMessageCount: number;
+export type Subscription = {
   name: string;
+  activeMessageCount: number;
+  deadLetterMessageCount: number;
+  createdAt: string;
 };
+
+export type SubscriptionsQueryResponse = Subscription;
 
 export type SubscriptionsQueryResponsePayload = {
   subscriptions: SubscriptionsQueryResponse[];

@@ -30,7 +30,7 @@ const initialAppState: AppState = {
   // selectedSubscription: null,
   selectedSubscription: {
     activeMessageCount: 0,
-    createdAt: new Date('2021-03-18T10:54:48.2479522+11:00'),
+    createdAt: '2021-03-18T10:54:48.2479522+11:00',
     deadLetterMessageCount: 167,
     name: 'replay-poc-subscription',
   },

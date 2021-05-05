@@ -1,7 +1,8 @@
 import React from 'react';
 import { ThemeProvider, ColorModeProvider, CSSReset } from '@chakra-ui/core';
 import { Global, css } from '@emotion/core';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { Router, Route } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
@@ -21,6 +22,7 @@ const queryClient = new QueryClient({
   },
 });
 const App: React.FC = () => {
+  const customHistory = createBrowserHistory();
   return (
     <ThemeProvider theme={THEME}>
       <ColorModeProvider value="light">
@@ -47,7 +49,7 @@ const App: React.FC = () => {
           <ErrorBoundary>
             <ConfigProvider appConfig={appConfigurations}>
               <AppStateProvider>
-                <Router basename={process.env.PUBLIC_URL}>
+                <Router history={customHistory}>
                   <Route component={SiteTemplate} />
                 </Router>
               </AppStateProvider>

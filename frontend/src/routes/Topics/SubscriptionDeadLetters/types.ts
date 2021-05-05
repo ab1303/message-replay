@@ -1,4 +1,7 @@
-import { SelectedSubscriptionState } from '../SubscriptionList/types';
+import {
+  SelectedSubscriptionState,
+  Subscription,
+} from '../SubscriptionList/types';
 
 export type SubscriptionDeadLettersQueryResponse = {
   messageId: string;
@@ -33,13 +36,6 @@ export type ResubmitDlqMessagesResponsePayload = {
 
 export type ResubmitDlqMessagesStatusResponsePayload = {
   response: ResubmitDlqMessagesResponse;
-};
-
-export type Subscription = {
-  name: string;
-  activeMessageCount: number;
-  deadLetterMessageCount: number;
-  createdAt: string;
 };
 
 export type ResubmitDlqMessagesResponse = {
