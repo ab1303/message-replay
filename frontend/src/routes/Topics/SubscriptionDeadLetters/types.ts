@@ -1,3 +1,5 @@
+import { SelectedSubscriptionState } from '../SubscriptionList/types';
+
 export type SubscriptionDeadLettersQueryResponse = {
   messageId: string;
   content: string;
@@ -46,4 +48,14 @@ export type ResubmitDlqMessagesResponse = {
   inProgress: boolean;
   subscription: Subscription;
   callBackUrl: string;
+};
+
+export enum SubscriptionDeadLettersEvent {
+  RESUBMIT_ALL_PROCESSED = 'SubscriptionDeadLetters/RESUBMIT_ALL_PROCESSED',
+}
+
+export type SubscriptionDeadLetters = {
+  [SubscriptionDeadLettersEvent.RESUBMIT_ALL_PROCESSED]: {
+    subscription: SelectedSubscriptionState;
+  };
 };

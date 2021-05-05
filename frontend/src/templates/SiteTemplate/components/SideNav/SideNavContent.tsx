@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, BoxProps } from '@chakra-ui/core';
+import { Box, BoxProps, Flex } from '@chakra-ui/core';
 
 import { SideNavMode } from './modules/constants';
 import SideNavItem from './SideNavItem';
@@ -22,7 +22,9 @@ const SideNavContent: React.FC<Props> = ({ mode, ...props }) => {
     <Box as="nav" aria-label="Main navigation" fontSize="sm" px="6" {...props}>
       <SideNavProfile mode={mode} />
       {appState.isLoading ? (
-        <DefaultSpinner />
+        <Flex h="7rem" direction="row" alignItems="center">
+          <DefaultSpinner />
+        </Flex>
       ) : (
         <SideNavMenu mode={mode} label="Service Bus Entity">
           {!!queues.length && (

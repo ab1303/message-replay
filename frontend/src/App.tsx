@@ -10,8 +10,16 @@ import { THEME } from 'src/styles';
 import appConfigurations from 'src/config';
 import ConfigProvider from 'src/providers/ConfigProvider';
 import { AppStateProvider } from './providers/AppStateProvider';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 2,
+    },
+  },
+});
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={THEME}>
@@ -36,15 +44,19 @@ const App: React.FC = () => {
         />
 
         <QueryClientProvider client={queryClient}>
-          <ConfigProvider appConfig={appConfigurations}>
-            <AppStateProvider>
-              <Router basename={process.env.PUBLIC_URL}>
-                <Route component={SiteTemplate} />
-              </Router>
-            </AppStateProvider>
-
-            <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-          </ConfigProvider>
+          <ErrorBoundary>
+            <ConfigProvider appConfig={appConfigurations}>
+              <AppStateProvider>
+                <Router basename={process.env.PUBLIC_URL}>
+                  <Route component={SiteTemplate} />
+                </Router>
+              </AppStateProvider>
+              <ReactQueryDevtools
+                initialIsOpen={false}
+                position="bottom-right"
+              />
+            </ConfigProvider>
+          </ErrorBoundary>
         </QueryClientProvider>
       </ColorModeProvider>
     </ThemeProvider>

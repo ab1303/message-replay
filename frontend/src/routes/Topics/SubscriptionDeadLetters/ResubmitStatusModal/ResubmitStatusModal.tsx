@@ -10,6 +10,7 @@ import {
   Stack,
   Text,
   useColorMode,
+  useToast,
 } from '@chakra-ui/core';
 import Card from '../../../../components/Card';
 import { ResubmitDlqMessagesResponse } from 'src/routes/Topics/SubscriptionDeadLetters/types';
@@ -48,6 +49,8 @@ const ResubmitStatusModal: React.FC<MessageModalProps> = ({
     resubmitDlqMessagesResponse,
   );
 
+  const toast = useToast();
+
   const [timerSeconds, setTimerSeconds] = useState<number>(
     toSeconds(!data ? '00:00:00' : data.callBackAfter),
   );
@@ -61,8 +64,17 @@ const ResubmitStatusModal: React.FC<MessageModalProps> = ({
     if (!data) return;
     setTimerSeconds(toSeconds(data.callBackAfter));
 
-    if (data.subscription.deadLetterMessageCount === 0) {
+    if (!data.inProgress) {
       closeResubmitStatusModal();
+      if (data.subscription.deadLetterMessageCount === 0) {
+        toast({
+          title: 'Subscription - DeadLetters.',
+          description: 'Request successfully processed by server',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
   }, [isFetching]);
 

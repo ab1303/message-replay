@@ -10,6 +10,7 @@ import {
   Box,
   Heading,
   Stack,
+  useToast,
 } from '@chakra-ui/core';
 import { SettingsEvent, SettingsFormData } from './types';
 import { useSettingsMutation } from './useSettingsMutation';
@@ -34,7 +35,10 @@ const Settings: React.FC = () => {
     control,
     reset,
   } = formMethods;
-  const settingsMutation = useSettingsMutation();
+
+  const { mutate, isLoading } = useSettingsMutation();
+  const toast = useToast();
+
   const submitHandler = (formData: SettingsFormData) => {
     console.log('User Recipient Form Data:', JSON.stringify(formData, null, 2));
 
@@ -43,7 +47,7 @@ const Settings: React.FC = () => {
       type: SettingsEvent.CONNECTION_CHANGE,
     });
 
-    settingsMutation.mutate(formData, {
+    mutate(formData, {
       onSuccess: result => {
         reset({
           connectionString: formData.connectionString,
@@ -55,6 +59,23 @@ const Settings: React.FC = () => {
             topics: result.data.topics,
           },
           type: SettingsEvent.CONNECTION_CHANGED,
+        });
+
+        toast({
+          title: 'Service Bus Settings.',
+          description: 'Connection string saved',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      },
+      onError: () => {
+        toast({
+          title: 'Service Bus Settings.',
+          description: 'Failed to save connection string',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
         });
       },
     });
@@ -76,7 +97,7 @@ const Settings: React.FC = () => {
             rounded="lg"
             shadow="1px 1px 3px rgba(0,0,0,0.3)"
           >
-            {appState.isLoading ? (
+            {isLoading ? (
               <DefaultSpinner />
             ) : (
               <Stack margin="auto" spacing={5}>

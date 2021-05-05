@@ -21,6 +21,7 @@ import {
   MenuItem,
   MenuList,
   Tooltip,
+  useToast,
 } from '@chakra-ui/core';
 
 import {
@@ -33,7 +34,6 @@ import {
 
 import {
   ResubmitDlqMessagesResponse,
-  ResubmitDlqMessagesResponsePayload,
   SubscriptionDeadLettersQueryResponse,
 } from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
@@ -121,8 +121,8 @@ const SubscriptionDeadLetters: React.FC = () => {
   }, [isFetching, resubmitAllState]);
 
   const deleteSelectedMutation = useDeleteSelectedMutation(topic, subscription);
-
   const resubmitAllMutation = useResubmitAllMutation(topic, subscription);
+  const toast = useToast();
 
   const columns = React.useMemo<Column<SubscriptionDeadLettersQueryResponse>[]>(
     () => [
@@ -218,6 +218,14 @@ const SubscriptionDeadLetters: React.FC = () => {
           showModal: true,
           response: result.data,
         });
+
+        toast({
+          title: 'Subscription - DeadLetters.',
+          description: 'Request successfully sent to server for processing',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
       },
     });
   };
@@ -311,11 +319,14 @@ const SubscriptionDeadLetters: React.FC = () => {
           <ResubmitStatusModal
             resubmitDlqMessagesResponse={resubmitAllState.response}
             openResubmitStatusModal={resubmitAllState.showModal}
-            closeResubmitStatusModal={() =>
-              setResubmitAllState({
-                showModal: false,
-                response: null,
-              })
+            closeResubmitStatusModal={
+              () =>
+                setResubmitAllState({
+                  showModal: false,
+                  response: null,
+                })
+
+              // TODO: Route and dispatch
             }
           />
         )}
