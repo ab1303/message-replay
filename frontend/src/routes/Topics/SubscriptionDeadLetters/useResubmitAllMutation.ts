@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { useMutation } from 'react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { AppConfigurations } from 'src/types';
 import { ConfigContext } from 'src/providers/ConfigProvider';
 import { ResubmitDlqMessagesResponsePayload } from './types';
@@ -13,7 +13,7 @@ export const useResubmitAllMutation = (
 
   const mutation = useMutation<
     ResubmitDlqMessagesResponsePayload,
-    unknown,
+    AxiosError,
     null
   >(() =>
     axios.post(

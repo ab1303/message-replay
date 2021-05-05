@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -11,10 +11,13 @@ import {
   Text,
   useColorMode,
   useToast,
+  Flex,
 } from '@chakra-ui/core';
+
+import { MdAlarm } from 'react-icons/md';
+
 import Card from '../../../../components/Card';
 import { ResubmitDlqMessagesResponse } from 'src/routes/Topics/SubscriptionDeadLetters/types';
-import { useState } from 'react';
 import { toHHMMSS, toSeconds } from 'src/utils/timeInterval';
 import StatCard from 'src/routes/Home/components/StatCard';
 import { useResubmitStatusQuery } from './useResubmitStatusQuery';
@@ -87,17 +90,28 @@ const ResubmitStatusModal: React.FC<MessageModalProps> = ({
     if (openResubmitStatusModal) onOpen();
   }, [openResubmitStatusModal]);
 
-  console.log('data response:', data);
-
   return (
     <Modal blockScrollOnMount isOpen={isOpen} onClose={() => {}}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader> {originalSubscriptionDetails.name} status</ModalHeader>
+        <ModalHeader>
+          {originalSubscriptionDetails.name.toUpperCase()} status
+        </ModalHeader>
         <Card>
-          <Text px={5} py={3}>
-            Refreshing in {toHHMMSS(timerSeconds)}
-          </Text>
+          <Stack
+            isInline
+            mt={3}
+            spacing={5}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Text py={3}>Refreshing status in </Text>
+
+            <Flex direction="row" alignItems="center">
+              <MdAlarm size="30px" style={{ marginRight: '5px' }} />
+              {toHHMMSS(timerSeconds)}
+            </Flex>
+          </Stack>
           <ModalBody>
             <Card.Body>
               {!data || isFetching ? (

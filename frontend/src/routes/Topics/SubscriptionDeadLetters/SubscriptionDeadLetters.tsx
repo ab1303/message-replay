@@ -44,6 +44,7 @@ import { useResubmitAllMutation } from './useResubmitAllMutation';
 import { useAppDispatch } from 'src/providers/AppStateProvider';
 import { Subscription } from '../SubscriptionList/types';
 import { Path } from 'src/router';
+import { AxiosError } from 'axios';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -230,6 +231,15 @@ const SubscriptionDeadLetters: React.FC = () => {
           title: 'Subscription - DeadLetters.',
           description: 'Request successfully sent to server for processing',
           status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      },
+      onError: (error: AxiosError) => {
+        toast({
+          title: 'Server Error',
+          description: error.message,
+          status: 'error',
           duration: 3000,
           isClosable: true,
         });
