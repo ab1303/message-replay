@@ -213,6 +213,14 @@ const SubscriptionDeadLetters: React.FC = () => {
             Date.parse(result.data.lockedUntilUtc),
           );
           refetch();
+
+          toast({
+            title: 'Subscription - DeadLetters.',
+            description: 'Selected Messages Deleted successfully!',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          });
           console.log('messages purged successfully, result:', result);
         },
       },

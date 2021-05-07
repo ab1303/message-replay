@@ -79,7 +79,7 @@ namespace MessageReplay.Api.Features.Subscriptions
             });
         }
 
-        [HttpPost("{subscriptionName}/deadletters/Resubmit", Name = "Resubmit")]
+        [HttpPost("{subscriptionName}/deadletters/resubmitAll", Name = "ResubmitAll")]
         public async Task<IActionResult> ReplayAllMessages(string topicName, string subscriptionName)
         {
             var result = await _replayMessageService.StartReplayingMessages(_connectionString, topicName, subscriptionName);
