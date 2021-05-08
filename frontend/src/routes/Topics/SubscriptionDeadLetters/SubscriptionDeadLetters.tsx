@@ -13,6 +13,8 @@ import {
 import { MdMoreVert } from 'react-icons/md';
 
 import {
+  Box,
+  Text,
   Button,
   Flex,
   Icon,
@@ -25,6 +27,7 @@ import {
 } from '@chakra-ui/core';
 
 import {
+  ActionAlertDialog,
   Card,
   Table,
   IndeterminateCheckbox,
@@ -44,8 +47,9 @@ import { useAppDispatch } from 'src/providers/AppStateProvider';
 import { Subscription } from '../SubscriptionList/types';
 import { Path } from 'src/router';
 import { AxiosError } from 'axios';
-import { useResubmitSelectedMutation } from './useResubmitSelectedMutation';
+
 import DeleteSelectedAlertDialog from './DeleteSelectedAlertDialog';
+import ResubmitSelectedAlertDialog from './ResubmitSelectedAlertDialog';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -96,8 +100,22 @@ const SubscriptionDeadLetters: React.FC = () => {
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [openMessageModal, setOpenMessageModal] = useState<boolean>(false);
   const [showTableLoading, setShowTableLoading] = useState<boolean>(false);
+  const [resubmitAllAlertDialog, setResubmitAllAlertDialog] = useState<boolean>(
+    false,
+  );
 
   const [deleteSelectedAlertDialog, setDeleteSelectedAlertDialog] = useState<{
+    showDialog: boolean;
+    messageIds: string[];
+  }>({
+    showDialog: false,
+    messageIds: [],
+  });
+
+  const [
+    resubmitSelectedAlertDialog,
+    setResubmitSelectedAlertDialog,
+  ] = useState<{
     showDialog: boolean;
     messageIds: string[];
   }>({
@@ -137,11 +155,6 @@ const SubscriptionDeadLetters: React.FC = () => {
 
     setShowTableLoading(false);
   }, [isFetching, resubmitAllState]);
-
-  const { mutate: resumbitSelectedMutation } = useResubmitSelectedMutation(
-    topic,
-    subscription,
-  );
 
   const resubmitAllMutation = useResubmitAllMutation(topic, subscription);
 
@@ -224,36 +237,10 @@ const SubscriptionDeadLetters: React.FC = () => {
 
   const resubmitSelectedHandler = () => {
     const messageIds = selectedFlatRows.map(sfr => sfr.original.messageId);
-    resumbitSelectedMutation(
-      {
-        messageIds,
-      },
-      {
-        onSuccess: result => {
-          setMessageSelectionLockedUntilUtc(
-            Date.parse(result.data.lockedUntilUtc),
-          );
-          refetch();
-
-          toast({
-            title: 'Subscription - DeadLetters.',
-            description: 'Selected Messages resubmitted successfully!',
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
-          });
-        },
-        onError: (error: AxiosError) => {
-          toast({
-            title: 'Server Error',
-            description: error.message,
-            status: 'error',
-            duration: 3000,
-            isClosable: true,
-          });
-        },
-      },
-    );
+    setResubmitSelectedAlertDialog({
+      showDialog: true,
+      messageIds,
+    });
   };
 
   const resubmitAllHandler = () => {
@@ -319,7 +306,7 @@ const SubscriptionDeadLetters: React.FC = () => {
                   </span>
                 )}
               </MenuItem>
-              <MenuItem onClick={resubmitAllHandler}>
+              <MenuItem onClick={() => setResubmitAllAlertDialog(true)}>
                 Resubmit all to Topic
               </MenuItem>
               <MenuItem
@@ -391,6 +378,49 @@ const SubscriptionDeadLetters: React.FC = () => {
           displayProps={['messageId', 'content']}
         />
 
+        <ActionAlertDialog
+          header="Resubmit All Messages"
+          isLoading={false}
+          openDialog={resubmitAllAlertDialog}
+          onAction={resubmitAllHandler}
+          onClose={() => setResubmitAllAlertDialog(false)}
+        >
+          <Text>
+            A request will be sent to background processor to resubmit all
+            messages. This might take some time to process all messages
+            depending on the number of messages.
+          </Text>
+        </ActionAlertDialog>
+
+        <ResubmitSelectedAlertDialog
+          actionText="Resubmit Selected"
+          header="Resubmit Selected Messages"
+          messageIds={resubmitSelectedAlertDialog.messageIds}
+          openDialog={resubmitSelectedAlertDialog.showDialog}
+          topic={topic}
+          subscription={subscription}
+          onActionSuccess={data => {
+            setMessageSelectionLockedUntilUtc(Date.parse(data.lockedUntilUtc));
+            refetch();
+            setResubmitSelectedAlertDialog({
+              showDialog: false,
+              messageIds: [],
+            });
+          }}
+          onActionFailure={() => {
+            setResubmitSelectedAlertDialog({
+              showDialog: false,
+              messageIds: [],
+            });
+          }}
+          onClose={() => {
+            setResubmitSelectedAlertDialog({
+              showDialog: false,
+              messageIds: [],
+            });
+          }}
+        />
+
         <DeleteSelectedAlertDialog
           actionText="Delete Selected"
           header="Delete Selected Messages"
@@ -401,6 +431,9 @@ const SubscriptionDeadLetters: React.FC = () => {
           onActionSuccess={data => {
             setMessageSelectionLockedUntilUtc(Date.parse(data.lockedUntilUtc));
             refetch();
+            setDeleteSelectedAlertDialog({ showDialog: false, messageIds: [] });
+          }}
+          onActionFailure={() => {
             setDeleteSelectedAlertDialog({ showDialog: false, messageIds: [] });
           }}
           onClose={() => {

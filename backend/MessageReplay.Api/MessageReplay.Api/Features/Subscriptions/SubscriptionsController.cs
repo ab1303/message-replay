@@ -80,7 +80,7 @@ namespace MessageReplay.Api.Features.Subscriptions
         }
 
         [HttpPost("{subscriptionName}/deadletters/resubmitAll", Name = "ResubmitAll")]
-        public async Task<IActionResult> ReplayAllMessages(string topicName, string subscriptionName)
+        public async Task<IActionResult> ResubmitAllMessages(string topicName, string subscriptionName)
         {
             var result = await _replayMessageService.StartReplayingMessages(_connectionString, topicName, subscriptionName);
             return Accepted(result);
@@ -88,20 +88,20 @@ namespace MessageReplay.Api.Features.Subscriptions
 
         [HttpPost("{subscriptionName}/deadletters/resubmit", Name = "ResubmitSelected")]
 
-        public async Task<IActionResult> ReplaySelectedDeadLetters(
+        public async Task<IActionResult> ResubmitSelectedDeadLetters(
             string topicName,
             string subscriptionName,
-            [FromBody] ReplaySelectedDeadLettersRequest request)
+            [FromBody] ResubmitSelectedDeadLettersRequest request)
         {
 
-            var result = await _topicHelper.DeleteSelectedDlqMessages(
+            var result = await _topicHelper.ResubmitSelectedDlqMessages(
                 _connectionString,
                 topicName,
                 subscriptionName,
                 request.MessageIds);
 
             if (result.IsSuccess)
-                return Ok(_mapper.Map<ReplaySelectedDlqMessagesResponse>(result.Model));
+                return Ok(_mapper.Map<ResubmitSelectedDlqMessagesResponse>(result.Model));
 
             return StatusCode((int)HttpStatusCode.InternalServerError, result.Error);
         }

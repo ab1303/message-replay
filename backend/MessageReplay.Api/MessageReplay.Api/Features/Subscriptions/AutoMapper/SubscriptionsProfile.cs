@@ -13,6 +13,7 @@ namespace MessageReplay.Api.Features.Subscriptions.AutoMapper
             CreateMap<Message, GetSubscriptionMessage>();
             CreateMap<Message, GetSubscriptionDeadLetter>();
             CreateMap<DeleteSelectedDlqMessagesDto, DeleteSelectedDlqMessagesResponse>();
+            CreateMap<ResubmitSelectedDlqMessagesDto, ResubmitSelectedDlqMessagesResponse>();
         }
     }
 }

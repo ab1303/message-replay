@@ -17,7 +17,7 @@ const SubscriptionList: React.FC = () => {
   return (
     // @ts-ignore
     <Stack spacing={3}>
-      <Heading as="h2" size="lg" color="blue.600">
+      <Heading as="h2" size="lg" color="main.500">
         {selectedSubscription.name}
       </Heading>
       <Tabs index={tabIndex} isManual>

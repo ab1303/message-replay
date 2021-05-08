@@ -1,19 +1,18 @@
-import { Box, useColorMode, useToast } from '@chakra-ui/core';
-import { AxiosError } from 'axios';
 import React, { useMemo } from 'react';
-import ActionAlertDialog, {
-  ActionAlertDialogProps,
-  DefaultSpinner,
-} from 'src/components';
+import { Box, Text, useColorMode, useToast } from '@chakra-ui/core';
+import { AxiosError } from 'axios';
+import ActionAlertDialog, { ActionAlertDialogProps } from 'src/components';
 import { DeleteSelectedDlqMessagesResponse } from '../types';
 import { useDeleteSelectedMutation } from '../useDeleteSelectedMutation';
+import FailedMessages from '../FailedMessages';
 
 interface DeleteSelectedAlertDialogProps
-  extends Omit<ActionAlertDialogProps, 'onAction'> {
+  extends Omit<ActionAlertDialogProps, 'onAction' | 'isLoading'> {
   messageIds: string[];
   topic: string;
   subscription: string;
   onActionSuccess: (data: DeleteSelectedDlqMessagesResponse) => void;
+  onActionFailure: (error: AxiosError) => void;
 }
 
 const DeleteSelectedAlertDialog: React.FC<DeleteSelectedAlertDialogProps> = ({
@@ -21,6 +20,7 @@ const DeleteSelectedAlertDialog: React.FC<DeleteSelectedAlertDialogProps> = ({
   topic,
   subscription,
   onActionSuccess,
+  onActionFailure,
   ...props
 }) => {
   const toast = useToast();
@@ -43,6 +43,20 @@ const DeleteSelectedAlertDialog: React.FC<DeleteSelectedAlertDialogProps> = ({
       {
         onSuccess: result => {
           onActionSuccess(result.data);
+          if (result.data.failedMessageIds.length) {
+            toast({
+              duration: 3000,
+              isClosable: true,
+              // eslint-disable-next-line react/display-name
+              render: () => (
+                <FailedMessages
+                  description="Some selected messages failed to delete."
+                  messageIds={result.data.failedMessageIds}
+                />
+              ),
+            });
+            return;
+          }
 
           toast({
             title: 'Subscription - DeadLetters.',
@@ -53,6 +67,7 @@ const DeleteSelectedAlertDialog: React.FC<DeleteSelectedAlertDialogProps> = ({
           });
         },
         onError: (error: AxiosError) => {
+          onActionFailure(error);
           toast({
             title: 'Server Error',
             description: error.message,
@@ -66,17 +81,18 @@ const DeleteSelectedAlertDialog: React.FC<DeleteSelectedAlertDialogProps> = ({
   };
 
   return (
-    <ActionAlertDialog {...props} onAction={deleteSelectedHandler}>
-      {isLoading ? (
-        <DefaultSpinner />
-      ) : (
-        <Box bg={bg} w="100%" p={4}>
-          Deleting requires receiving messages to perform and this increases the
-          DeliveryCount of the messages. There can be consequences to other
-          messages in this subscription, Are you sure? Are you sure you would
-          like to delete messages AND increase the delivery count.
-        </Box>
-      )}
+    <ActionAlertDialog
+      {...props}
+      isLoading={isLoading}
+      onAction={deleteSelectedHandler}
+    >
+      <Text>
+        Deleting requires receiving messages to perform and this increases the
+        DeliveryCount of the messages.
+      </Text>
+      There can be consequences to other messages in this subscription, Are you
+      sure? Are you sure you would like to delete selected messages AND increase
+      the delivery count.
     </ActionAlertDialog>
   );
 };

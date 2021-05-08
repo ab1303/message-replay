@@ -172,6 +172,58 @@ namespace MessageReplay.Api.Helpers
             return purgedCount;
         }
 
+        private async Task<AzureMessage> PeekDlqMessageBySequenceNumber(string connectionString, string topicPath,
+            string subscriptionPath, long sequenceNumber)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+            var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
+
+            var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
+            var azureMessage = await receiver.PeekBySequenceNumberAsync(sequenceNumber);
+            await receiver.CloseAsync();
+
+            return azureMessage;
+        }
+
+        public async Task ResubmitDlqMessageAsync(string connectionString, string topicPath, string subscriptionPath,
+            Message message)
+        {
+            var azureMessage = await PeekDlqMessageBySequenceNumber(connectionString, topicPath, subscriptionPath,
+                message.SequenceNumber);
+            var clonedMessage = azureMessage.CloneMessage();
+
+            await SendMessageAsync(connectionString, topicPath, clonedMessage);
+
+            await DeleteMessageAsync(connectionString, topicPath, subscriptionPath, message, true);
+        }
+
+        public async Task DeadletterMessageAsync(string connectionString, string topicPath, string subscriptionPath,
+            Message message)
+        {
+            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+
+            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
+
+            while (true)
+            {
+                var messages = await receiver.ReceiveAsync(_maxMessageCount);
+                if (messages == null || messages.Count == 0)
+                {
+                    break;
+                }
+
+                var foundMessage = messages.FirstOrDefault(m => m.MessageId.Equals(message.MessageId));
+                if (foundMessage != null)
+                {
+                    await receiver.DeadLetterAsync(foundMessage.SystemProperties.LockToken);
+                    break;
+                }
+            }
+
+            await receiver.CloseAsync();
+        }
+
+
         public async Task<Result<DeleteSelectedDlqMessagesDto>> DeleteSelectedDlqMessages(string connectionString, string topicPath,
             string subscriptionPath, string[] messageIds)
         {
@@ -226,55 +278,62 @@ namespace MessageReplay.Api.Helpers
 
         }
 
-        private async Task<AzureMessage> PeekDlqMessageBySequenceNumber(string connectionString, string topicPath,
-            string subscriptionPath, long sequenceNumber)
+        public async Task<Result<ResubmitSelectedDlqMessagesDto>> ResubmitSelectedDlqMessages(string connectionString, string topicPath,
+            string subscriptionPath, string[] messageIds)
         {
-            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
-            var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
-
-            var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
-            var azureMessage = await receiver.PeekBySequenceNumberAsync(sequenceNumber);
-            await receiver.CloseAsync();
-
-            return azureMessage;
-        }
-
-        public async Task ResubmitDlqMessageAsync(string connectionString, string topicPath, string subscriptionPath,
-            Message message)
-        {
-            var azureMessage = await PeekDlqMessageBySequenceNumber(connectionString, topicPath, subscriptionPath,
-                message.SequenceNumber);
-            var clonedMessage = azureMessage.CloneMessage();
-
-            await SendMessageAsync(connectionString, topicPath, clonedMessage);
-
-            await DeleteMessageAsync(connectionString, topicPath, subscriptionPath, message, true);
-        }
-
-        public async Task DeadletterMessageAsync(string connectionString, string topicPath, string subscriptionPath,
-            Message message)
-        {
-            var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
-
-            var receiver = new MessageReceiver(connectionString, path, ReceiveMode.PeekLock);
-
-            while (true)
+            try
             {
+                var path = EntityNameHelper.FormatSubscriptionPath(topicPath, subscriptionPath);
+                var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
+
+                var receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
                 var messages = await receiver.ReceiveAsync(_maxMessageCount);
                 if (messages == null || messages.Count == 0)
                 {
-                    break;
+                    return Result<ResubmitSelectedDlqMessagesDto>.Fail(
+                        new Error
+                        {
+                            Message = "Messages not received for settlement"
+                        });
                 }
 
-                var foundMessage = messages.FirstOrDefault(m => m.MessageId.Equals(message.MessageId));
-                if (foundMessage != null)
+                var lockedUntilUtc = messages.First().SystemProperties.LockedUntilUtc;
+                var failedMessageIds = new List<string>();
+                foreach (string msgId in messageIds)
                 {
-                    await receiver.DeadLetterAsync(foundMessage.SystemProperties.LockToken);
-                    break;
+                    var azureMessage = messages.FirstOrDefault(m => m.MessageId.Equals(msgId));
+                    if (azureMessage != null)
+                    {
+                        var clonedMessage = azureMessage.CloneMessage();
+
+                        await SendMessageAsync(connectionString, topicPath, clonedMessage);
+
+                        await receiver.CompleteAsync(azureMessage.SystemProperties.LockToken);
+                        continue;
+                    }
+
+                    failedMessageIds.Add(msgId);
+
                 }
+
+                await receiver.CloseAsync();
+                return Result<ResubmitSelectedDlqMessagesDto>.Ok(
+                        new ResubmitSelectedDlqMessagesDto
+                        {
+                            LockedUntilUtc = lockedUntilUtc,
+                            FailedMessageIds = failedMessageIds
+                        });
+
+            }
+            catch (Exception ex)
+            {
+                return Result<ResubmitSelectedDlqMessagesDto>.Fail(
+                      new Error
+                      {
+                          Message = ex.Message
+                      });
             }
 
-            await receiver.CloseAsync();
         }
 
 
@@ -298,6 +357,9 @@ namespace MessageReplay.Api.Helpers
         public Task DeadletterMessageAsync(string connectionString, string topicPath, string subscriptionPath,
             Message message);
         public Task<Result<DeleteSelectedDlqMessagesDto>> DeleteSelectedDlqMessages(string connectionString, string topicPath,
+            string subscriptionPath, string[] messageIds);
+
+        public Task<Result<ResubmitSelectedDlqMessagesDto>> ResubmitSelectedDlqMessages(string connectionString, string topicPath,
             string subscriptionPath, string[] messageIds);
     }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   AlertDialog,
   AlertDialogBody,
@@ -6,8 +6,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
+  Box,
   Button,
+  useColorMode,
 } from '@chakra-ui/core';
+import { DefaultSpinner } from '..';
 
 export interface ActionAlertDialogProps {
   header: string;
@@ -15,6 +18,7 @@ export interface ActionAlertDialogProps {
   actionColor?: string;
   cancelActionText?: string;
   openDialog: boolean;
+  isLoading: boolean;
   onClose: () => void;
   onAction: () => void;
 }
@@ -22,6 +26,7 @@ export interface ActionAlertDialogProps {
 const ActionAlertDialog: React.FC<ActionAlertDialogProps> = ({
   header,
   openDialog,
+  isLoading,
   actionText = 'Confirm',
   actionColor = 'red',
   cancelActionText = 'Cancel',
@@ -31,6 +36,10 @@ const ActionAlertDialog: React.FC<ActionAlertDialogProps> = ({
 }) => {
   const [isOpen, setIsOpen] = React.useState<boolean>(openDialog);
   const cancelRef = React.useRef<HTMLInputElement>(null);
+  const { colorMode } = useColorMode();
+  const bg = useMemo(() => (colorMode === 'dark' ? 'gray.600' : 'gray.50'), [
+    colorMode,
+  ]);
 
   useEffect(() => {
     setIsOpen(openDialog);
@@ -48,15 +57,25 @@ const ActionAlertDialog: React.FC<ActionAlertDialogProps> = ({
           {header}
         </AlertDialogHeader>
 
-        <AlertDialogBody>{children}</AlertDialogBody>
+        <AlertDialogBody>
+          <Box bg={bg} w="100%" p={4}>
+            {children}
+          </Box>
+        </AlertDialogBody>
 
         <AlertDialogFooter>
-          <Button ref={cancelRef} onClick={onClose}>
-            {cancelActionText}
-          </Button>
-          <Button variantColor={actionColor} onClick={onAction} ml={3}>
-            {actionText}
-          </Button>
+          {isLoading ? (
+            <DefaultSpinner />
+          ) : (
+            <>
+              <Button ref={cancelRef} onClick={onClose}>
+                {cancelActionText}
+              </Button>
+              <Button variantColor={actionColor} onClick={onAction} ml={3}>
+                {actionText}
+              </Button>
+            </>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
