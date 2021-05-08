@@ -38,7 +38,6 @@ import {
   SubscriptionDeadLettersQueryResponse,
 } from './types';
 import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQuery';
-import { useDeleteSelectedMutation } from './useDeleteSelectedMutation';
 import ResubmitStatusModal from 'src/routes/Topics/SubscriptionDeadLetters/ResubmitStatusModal';
 import { useResubmitAllMutation } from './useResubmitAllMutation';
 import { useAppDispatch } from 'src/providers/AppStateProvider';
@@ -46,6 +45,7 @@ import { Subscription } from '../SubscriptionList/types';
 import { Path } from 'src/router';
 import { AxiosError } from 'axios';
 import { useResubmitSelectedMutation } from './useResubmitSelectedMutation';
+import DeleteSelectedAlertDialog from './DeleteSelectedAlertDialog';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -97,6 +97,14 @@ const SubscriptionDeadLetters: React.FC = () => {
   const [openMessageModal, setOpenMessageModal] = useState<boolean>(false);
   const [showTableLoading, setShowTableLoading] = useState<boolean>(false);
 
+  const [deleteSelectedAlertDialog, setDeleteSelectedAlertDialog] = useState<{
+    showDialog: boolean;
+    messageIds: string[];
+  }>({
+    showDialog: false,
+    messageIds: [],
+  });
+
   const [resubmitAllState, setResubmitAllState] = useState<{
     showModal: boolean;
     response: ResubmitDlqMessagesResponse | null;
@@ -130,11 +138,11 @@ const SubscriptionDeadLetters: React.FC = () => {
     setShowTableLoading(false);
   }, [isFetching, resubmitAllState]);
 
-  const deleteSelectedMutation = useDeleteSelectedMutation(topic, subscription);
-  const resumbitSelectedMutation = useResubmitSelectedMutation(
+  const { mutate: resumbitSelectedMutation } = useResubmitSelectedMutation(
     topic,
     subscription,
   );
+
   const resubmitAllMutation = useResubmitAllMutation(topic, subscription);
 
   const columns = React.useMemo<Column<SubscriptionDeadLettersQueryResponse>[]>(
@@ -208,41 +216,15 @@ const SubscriptionDeadLetters: React.FC = () => {
 
   const deleteSelectedHandler = () => {
     const messageIds = selectedFlatRows.map(sfr => sfr.original.messageId);
-    deleteSelectedMutation.mutate(
-      {
-        messageIds,
-      },
-      {
-        onSuccess: result => {
-          setMessageSelectionLockedUntilUtc(
-            Date.parse(result.data.lockedUntilUtc),
-          );
-          refetch();
-
-          toast({
-            title: 'Subscription - DeadLetters.',
-            description: 'Selected Messages Deleted successfully!',
-            status: 'success',
-            duration: 3000,
-            isClosable: true,
-          });
-        },
-        onError: (error: AxiosError) => {
-          toast({
-            title: 'Server Error',
-            description: error.message,
-            status: 'error',
-            duration: 3000,
-            isClosable: true,
-          });
-        },
-      },
-    );
+    setDeleteSelectedAlertDialog({
+      showDialog: true,
+      messageIds,
+    });
   };
 
   const resubmitSelectedHandler = () => {
     const messageIds = selectedFlatRows.map(sfr => sfr.original.messageId);
-    resumbitSelectedMutation.mutate(
+    resumbitSelectedMutation(
       {
         messageIds,
       },
@@ -404,9 +386,26 @@ const SubscriptionDeadLetters: React.FC = () => {
 
         <MessageModal
           openMessageModal={openMessageModal}
-          closeMessageModal={() => setOpenMessageModal(false)}
+          onCloseMessageModal={() => setOpenMessageModal(false)}
           message={rowIndex != null ? tableData[rowIndex] : null}
           displayProps={['messageId', 'content']}
+        />
+
+        <DeleteSelectedAlertDialog
+          actionText="Delete Selected"
+          header="Delete Selected Messages"
+          messageIds={deleteSelectedAlertDialog.messageIds}
+          openDialog={deleteSelectedAlertDialog.showDialog}
+          topic={topic}
+          subscription={subscription}
+          onActionSuccess={data => {
+            setMessageSelectionLockedUntilUtc(Date.parse(data.lockedUntilUtc));
+            refetch();
+            setDeleteSelectedAlertDialog({ showDialog: false, messageIds: [] });
+          }}
+          onClose={() => {
+            setDeleteSelectedAlertDialog({ showDialog: false, messageIds: [] });
+          }}
         />
 
         {resubmitAllState.response && (

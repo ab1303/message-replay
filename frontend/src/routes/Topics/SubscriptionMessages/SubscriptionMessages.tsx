@@ -126,7 +126,7 @@ const SubscriptionMessages: React.FC = () => {
 
         <MessageModal
           openMessageModal={openMessageModal}
-          closeMessageModal={() => setOpenMessageModal(false)}
+          onCloseMessageModal={() => setOpenMessageModal(false)}
           message={modalRowIndex != null ? tableData[modalRowIndex] : null}
           displayProps={['messageId', 'content']}
         />

@@ -23,14 +23,14 @@ interface MessageModalProps {
   message: responseType | null;
   displayProps: Array<keyof responseType>;
   openMessageModal: boolean;
-  closeMessageModal: () => void;
+  onCloseMessageModal: () => void;
 }
 
 const MessageModal: React.FC<MessageModalProps> = ({
   message,
   displayProps,
   openMessageModal,
-  closeMessageModal,
+  onCloseMessageModal,
 }) => {
   const getMessageProp = (obj: responseType, key: keyof responseType) =>
     obj[key];
@@ -46,7 +46,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
       blockScrollOnMount
       isOpen={isOpen}
       onClose={() => {
-        closeMessageModal();
+        onCloseMessageModal();
         onClose();
       }}
       size="3xl"
