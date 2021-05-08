@@ -227,6 +227,15 @@ const SubscriptionDeadLetters: React.FC = () => {
             isClosable: true,
           });
         },
+        onError: (error: AxiosError) => {
+          toast({
+            title: 'Server Error',
+            description: error.message,
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          });
+        },
       },
     );
   };
@@ -248,6 +257,15 @@ const SubscriptionDeadLetters: React.FC = () => {
             title: 'Subscription - DeadLetters.',
             description: 'Selected Messages resubmitted successfully!',
             status: 'success',
+            duration: 3000,
+            isClosable: true,
+          });
+        },
+        onError: (error: AxiosError) => {
+          toast({
+            title: 'Server Error',
+            description: error.message,
+            status: 'error',
             duration: 3000,
             isClosable: true,
           });
