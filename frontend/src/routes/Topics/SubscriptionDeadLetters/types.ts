@@ -21,14 +21,22 @@ export type DeleteSelectedFormData = {
   messageIds: string[];
 };
 
+export type ResubmitSelectedFormData = DeleteSelectedFormData;
+
 export type DeleteSelectedDlqMessagesResponsePayload = {
   data: DeleteSelectedDlqMessagesResponse;
+};
+
+export type ResubmitSelectedDlqMessagesResponsePayload = {
+  data: ResubmitSelectedDlqMessagesResponse;
 };
 
 export type DeleteSelectedDlqMessagesResponse = {
   failedMessageIds: string[];
   lockedUntilUtc: string;
 };
+
+export type ResubmitSelectedDlqMessagesResponse = DeleteSelectedDlqMessagesResponse;
 
 export type ResubmitDlqMessagesResponsePayload = {
   data: ResubmitDlqMessagesResponse;

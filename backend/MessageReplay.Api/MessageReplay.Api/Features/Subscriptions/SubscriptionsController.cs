@@ -86,6 +86,26 @@ namespace MessageReplay.Api.Features.Subscriptions
             return Accepted(result);
         }
 
+        [HttpPost("{subscriptionName}/deadletters/resubmit", Name = "ResubmitSelected")]
+
+        public async Task<IActionResult> ReplaySelectedDeadLetters(
+            string topicName,
+            string subscriptionName,
+            [FromBody] ReplaySelectedDeadLettersRequest request)
+        {
+
+            var result = await _topicHelper.DeleteSelectedDlqMessages(
+                _connectionString,
+                topicName,
+                subscriptionName,
+                request.MessageIds);
+
+            if (result.IsSuccess)
+                return Ok(_mapper.Map<ReplaySelectedDlqMessagesResponse>(result.Model));
+
+            return StatusCode((int)HttpStatusCode.InternalServerError, result.Error);
+        }
+
 
         [HttpGet("{subscriptionName}/deadletters/resubmit/status/{processId}", Name = "ResubmitStatus")]
         public async Task<IActionResult> GetStatus(string topicName, string subscriptionName, Guid processId)
@@ -94,7 +114,7 @@ namespace MessageReplay.Api.Features.Subscriptions
             return Ok(result);
         }
 
-        [HttpPost("{subscriptionName}/deadletters/delete", Name = "DeleteSelectedDeadLetters")]
+        [HttpPost("{subscriptionName}/deadletters/delete", Name = "DeleteSelected")]
 
         public async Task<IActionResult> DeleteSelectedDeadLetters(
             string topicName,
@@ -114,7 +134,7 @@ namespace MessageReplay.Api.Features.Subscriptions
             return StatusCode((int)HttpStatusCode.InternalServerError, result.Error);
         }
 
-        [HttpDelete("{subscriptionName}/deadletters", Name = "DeleteAllSubscriptionDeadLetters")]
+        [HttpPost("{subscriptionName}/deadletters/deleteAll", Name = "DeleteAll")]
 
         public async Task<IActionResult> DeleteAllSubscriptionDeadLetters(string topicName, string subscriptionName, [FromBody] long[] sequenceNo)
         {

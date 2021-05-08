@@ -45,6 +45,7 @@ import { useAppDispatch } from 'src/providers/AppStateProvider';
 import { Subscription } from '../SubscriptionList/types';
 import { Path } from 'src/router';
 import { AxiosError } from 'axios';
+import { useResubmitSelectedMutation } from './useResubmitSelectedMutation';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -89,8 +90,8 @@ const SubscriptionDeadLetters: React.FC = () => {
   const appDispatch = useAppDispatch();
 
   const [
-    deleteSelectedLockedUntilUtc,
-    setDeleteSelectedLockedUntilUtc,
+    messageSelectionLockedUntilUtc,
+    setMessageSelectionLockedUntilUtc,
   ] = useState<number | null>(null);
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [openMessageModal, setOpenMessageModal] = useState<boolean>(false);
@@ -107,18 +108,18 @@ const SubscriptionDeadLetters: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!deleteSelectedLockedUntilUtc) return;
+    if (!messageSelectionLockedUntilUtc) return;
 
     const interval = window.setInterval(() => {
-      if (Date.now() > deleteSelectedLockedUntilUtc) {
-        setDeleteSelectedLockedUntilUtc(null);
+      if (Date.now() > messageSelectionLockedUntilUtc) {
+        setMessageSelectionLockedUntilUtc(null);
       }
     }, 1000);
     return () => {
       console.log('Timer cleared');
       window.clearInterval(interval);
     };
-  }, [deleteSelectedLockedUntilUtc]);
+  }, [messageSelectionLockedUntilUtc]);
 
   useEffect(() => {
     if (isFetching || resubmitAllState.showModal) {
@@ -130,6 +131,10 @@ const SubscriptionDeadLetters: React.FC = () => {
   }, [isFetching, resubmitAllState]);
 
   const deleteSelectedMutation = useDeleteSelectedMutation(topic, subscription);
+  const resumbitSelectedMutation = useResubmitSelectedMutation(
+    topic,
+    subscription,
+  );
   const resubmitAllMutation = useResubmitAllMutation(topic, subscription);
 
   const columns = React.useMemo<Column<SubscriptionDeadLettersQueryResponse>[]>(
@@ -197,9 +202,9 @@ const SubscriptionDeadLetters: React.FC = () => {
     ...hooks,
   );
 
-  const disableDeleteSelected =
-    deleteSelectedLockedUntilUtc != null &&
-    deleteSelectedLockedUntilUtc > Date.now();
+  const disableSelectedAction =
+    messageSelectionLockedUntilUtc != null &&
+    messageSelectionLockedUntilUtc > Date.now();
 
   const deleteSelectedHandler = () => {
     const messageIds = selectedFlatRows.map(sfr => sfr.original.messageId);
@@ -209,7 +214,7 @@ const SubscriptionDeadLetters: React.FC = () => {
       },
       {
         onSuccess: result => {
-          setDeleteSelectedLockedUntilUtc(
+          setMessageSelectionLockedUntilUtc(
             Date.parse(result.data.lockedUntilUtc),
           );
           refetch();
@@ -221,7 +226,31 @@ const SubscriptionDeadLetters: React.FC = () => {
             duration: 3000,
             isClosable: true,
           });
-          console.log('messages purged successfully, result:', result);
+        },
+      },
+    );
+  };
+
+  const resubmitSelectedHandler = () => {
+    const messageIds = selectedFlatRows.map(sfr => sfr.original.messageId);
+    resumbitSelectedMutation.mutate(
+      {
+        messageIds,
+      },
+      {
+        onSuccess: result => {
+          setMessageSelectionLockedUntilUtc(
+            Date.parse(result.data.lockedUntilUtc),
+          );
+          refetch();
+
+          toast({
+            title: 'Subscription - DeadLetters.',
+            description: 'Selected Messages resubmitted successfully!',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          });
         },
       },
     );
@@ -268,11 +297,11 @@ const SubscriptionDeadLetters: React.FC = () => {
             <MenuList>
               <MenuItem>Delete all</MenuItem>
               <MenuItem
-                isDisabled={disableDeleteSelected}
+                isDisabled={disableSelectedAction}
                 onClick={deleteSelectedHandler}
               >
                 Delete selected
-                {disableDeleteSelected && (
+                {disableSelectedAction && (
                   <span
                     style={{
                       marginLeft: '5px',
@@ -293,7 +322,29 @@ const SubscriptionDeadLetters: React.FC = () => {
               <MenuItem onClick={resubmitAllHandler}>
                 Resubmit all to Topic
               </MenuItem>
-              <MenuItem>Resubmit selected to Topic</MenuItem>
+              <MenuItem
+                isDisabled={disableSelectedAction}
+                onClick={resubmitSelectedHandler}
+              >
+                Resubmit selected to Topic
+                {disableSelectedAction && (
+                  <span
+                    style={{
+                      marginLeft: '5px',
+                      marginBottom: '5px',
+                    }}
+                  >
+                    <Tooltip
+                      zIndex={2}
+                      aria-label="Warning"
+                      label="Please try resubmitting individual messages after few seconds"
+                      placement="right"
+                    >
+                      <Icon size="5" color="yellow.600" name="warning" />
+                    </Tooltip>
+                  </span>
+                )}
+              </MenuItem>
             </MenuList>
           </Menu>
         </Flex>

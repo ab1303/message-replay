@@ -29,6 +29,15 @@ export const appReducer = (
         },
         selectedSubscription: null,
       };
+    case SettingsEvent.CONNECTION_CHANGE_ERROR:
+      return {
+        isLoading: false,
+        settings: settingsReducer(settings, action),
+        entity: {
+          ...entity,
+        },
+        selectedSubscription: null,
+      };
     case SubscriptionListEvent.SUBSCRIPTION_SELECTED:
       return {
         isLoading: false,

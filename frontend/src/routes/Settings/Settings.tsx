@@ -70,6 +70,11 @@ const Settings: React.FC = () => {
         });
       },
       onError: () => {
+        appDispatch({
+          payload: {},
+          type: SettingsEvent.CONNECTION_CHANGE_ERROR,
+        });
+
         toast({
           title: 'Service Bus Settings.',
           description: 'Failed to save connection string',
