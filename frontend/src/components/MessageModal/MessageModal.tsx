@@ -49,6 +49,7 @@ const MessageModal: React.FC<MessageModalProps> = ({
         closeMessageModal();
         onClose();
       }}
+      size="3xl"
     >
       <ModalOverlay />
       <ModalContent>
