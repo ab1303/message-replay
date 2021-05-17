@@ -1,3 +1,14 @@
+export type SubscriptionInfo = {
+  name: string;
+  activeMessageCount: number;
+  deadLetterMessageCount: number;
+  createdAt: string;
+};
+
+export type SubscriptionInfoQueryResponsePayload = {
+  subscriptionInfo: SubscriptionInfo;
+};
+
 export type SubscriptionMessagesQueryResponse = {
   messageId: string;
   subject: string;

@@ -7,14 +7,14 @@ namespace MessageReplay.Api.Helpers
 {
     public class TopicInfoHelper
     {
-        public static async Task<GetTopicSubscription> GetSubscriptionInfo(string topicName,string subscriptionName)
+        public static async Task<GetTopicSubscriptionResponse> GetSubscriptionInfo(string topicName,string subscriptionName)
         {
             var subscription = await ServiceBusManagementClientSingleton
                 .Instance
                 .Client
                 .GetSubscriptionRuntimeInfoAsync(topicName,subscriptionName);
 
-            return new GetTopicSubscription
+            return new GetTopicSubscriptionResponse
             {
                 Name = subscription.SubscriptionName,
                 ActiveMessageCount = subscription.MessageCountDetails.ActiveMessageCount,

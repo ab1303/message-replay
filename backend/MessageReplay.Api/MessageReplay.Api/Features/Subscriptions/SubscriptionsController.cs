@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using MessageReplay.Api.Features.Subscriptions.Requests;
 using MessageReplay.Api.Features.Subscriptions.Responses;
 using System.Net;
+using Microsoft.Azure.ServiceBus.Management;
 
 namespace MessageReplay.Api.Features.Subscriptions
 {
@@ -26,6 +27,7 @@ namespace MessageReplay.Api.Features.Subscriptions
         private readonly ITopicHelper _topicHelper;
         private readonly ReplayMessageService _replayMessageService;
         private readonly string _connectionString;
+        private readonly ManagementClient _client;
 
         /// <summary>
         /// 
@@ -33,6 +35,7 @@ namespace MessageReplay.Api.Features.Subscriptions
         /// <param name="logger"></param>
         /// <param name="mapper"></param>
         /// <param name="topicHelper"></param>
+        /// <param name="replayMessageService"></param>
         public SubscriptionsController(
             IMapper mapper,
             ILogger<SubscriptionsController> logger,
@@ -45,7 +48,30 @@ namespace MessageReplay.Api.Features.Subscriptions
             _topicHelper = topicHelper;
             _replayMessageService = replayMessageService;
             _connectionString = ServiceBusClientSingleton.Instance.ConnectionString;
+            _client = ServiceBusManagementClientSingleton.Instance.Client;
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="topicName"></param>
+        /// <param name="subscriptionName"></param>
+        /// <returns></returns>
+        [HttpGet("{subscriptionName}/Info", Name = "GetSubscriptionInfo")]
+
+        public async Task<IActionResult> GetSubscriptionInfo(string topicName, string subscriptionName)
+        {
+            var subscriptionInfo = await _client.GetSubscriptionRuntimeInfoAsync(topicName, subscriptionName);
+
+
+            return Ok(new GetTopicSubscriptionResponse
+            {
+                Name = subscriptionInfo.SubscriptionName,
+                ActiveMessageCount = subscriptionInfo.MessageCountDetails.ActiveMessageCount,
+                DeadLetterMessageCount = subscriptionInfo.MessageCountDetails.DeadLetterMessageCount,
+                CreatedAt = subscriptionInfo.CreatedAt
+            });
         }
 
         /// <summary>

@@ -10,7 +10,7 @@ namespace MessageReplay.Api.Common
         public Guid ProcessId { get; set; }
         public TimeSpan CallBackAfter => new TimeSpan(0, 0, 3);
         public bool InProgress { get; set; }
-        public GetTopicSubscription Subscription { get; set; }
+        public GetTopicSubscriptionResponse Subscription { get; set; }
 
         public string CallBackUrl =>
             $"servicebus/topics/replay-poc-topic/Subscriptions/replay-poc-subscription/deadletters/resubmit/status/{ProcessId}";

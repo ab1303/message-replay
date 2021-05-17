@@ -13,7 +13,6 @@ import {
 import { MdMoreVert } from 'react-icons/md';
 
 import {
-  Box,
   Text,
   Button,
   Flex,
@@ -44,12 +43,13 @@ import { useSubscriptionDeadLettersQuery } from './useSubscriptionDeadLettersQue
 import ResubmitStatusModal from 'src/routes/Topics/SubscriptionDeadLetters/ResubmitStatusModal';
 import { useResubmitAllMutation } from './useResubmitAllMutation';
 import { useAppDispatch } from 'src/providers/AppStateProvider';
-import { Subscription } from '../SubscriptionList/types';
+
 import { Path } from 'src/router';
 import { AxiosError } from 'axios';
 
 import DeleteSelectedAlertDialog from './DeleteSelectedAlertDialog';
 import ResubmitSelectedAlertDialog from './ResubmitSelectedAlertDialog';
+import { SubscriptionInfo } from '../Subscription/types';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -445,7 +445,9 @@ const SubscriptionDeadLetters: React.FC = () => {
           <ResubmitStatusModal
             resubmitDlqMessagesResponse={resubmitAllState.response}
             openResubmitStatusModal={resubmitAllState.showModal}
-            closeResubmitStatusModal={(updatedSubscription: Subscription) => {
+            closeResubmitStatusModal={(
+              updatedSubscription: SubscriptionInfo,
+            ) => {
               setResubmitAllState({
                 showModal: false,
                 response: null,

@@ -1,7 +1,5 @@
-import {
-  SelectedSubscriptionState,
-  Subscription,
-} from '../SubscriptionList/types';
+import { SubscriptionInfo } from '../Subscription/types';
+import { SelectedSubscriptionState } from '../SubscriptionList/types';
 
 export type SubscriptionDeadLettersQueryResponse = {
   messageId: string;
@@ -50,7 +48,7 @@ export type ResubmitDlqMessagesResponse = {
   processId: string;
   callBackAfter: string;
   inProgress: boolean;
-  subscription: Subscription;
+  subscription: SubscriptionInfo;
   callBackUrl: string;
 };
 

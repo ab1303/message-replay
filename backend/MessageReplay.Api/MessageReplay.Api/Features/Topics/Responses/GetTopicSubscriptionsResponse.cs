@@ -1,11 +1,10 @@
-﻿using Azure.Messaging.ServiceBus.Administration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MessageReplay.Api.Features.Topics.Responses
 {
 
-    public class GetTopicSubscription
+    public class GetTopicSubscriptionResponse
     {
         public string Name { get; set; }
         public long ActiveMessageCount { get; set; }
@@ -15,6 +14,6 @@ namespace MessageReplay.Api.Features.Topics.Responses
 
     public class GetTopicSubscriptionsResponse
     {
-        public List<GetTopicSubscription> Subscriptions { get; set; }
+        public List<GetTopicSubscriptionResponse> Subscriptions { get; set; }
     }
 }

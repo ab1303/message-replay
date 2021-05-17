@@ -1,4 +1,14 @@
-import { Heading, Stack, Tab, TabList, TabPanels, Tabs } from '@chakra-ui/core';
+import {
+  Flex,
+  Heading,
+  Stack,
+  Tab,
+  TabList,
+  TabPanels,
+  Tabs,
+  Tooltip,
+  IconButton,
+} from '@chakra-ui/core';
 import React from 'react';
 import { NavLink, useRouteMatch, Route, Switch } from 'react-router-dom';
 import { useAppState } from 'src/providers/AppStateProvider';
@@ -18,7 +28,19 @@ const SubscriptionList: React.FC = () => {
     // @ts-ignore
     <Stack spacing={3}>
       <Heading as="h2" size="lg" color="main.500">
-        {selectedSubscription.name}
+        <Flex align="center" justify="space-between">
+          {selectedSubscription.name}
+          <Tooltip
+            aria-label="refresh-subscription-count-tooltip"
+            label="Refresh Subscription Counts"
+            placement="top"
+          >
+            <IconButton
+              aria-label="refresh-subscription-count-button"
+              icon="repeat"
+            />
+          </Tooltip>
+        </Flex>
       </Heading>
       <Tabs index={tabIndex} isManual>
         <TabList>

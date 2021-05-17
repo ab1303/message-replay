@@ -1,11 +1,6 @@
-export type Subscription = {
-  name: string;
-  activeMessageCount: number;
-  deadLetterMessageCount: number;
-  createdAt: string;
-};
+import { SubscriptionInfo } from '../Subscription/types';
 
-export type SubscriptionsQueryResponse = Subscription;
+export type SubscriptionsQueryResponse = SubscriptionInfo;
 
 export type SubscriptionsQueryResponsePayload = {
   subscriptions: SubscriptionsQueryResponse[];

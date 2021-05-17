@@ -23,11 +23,11 @@ import StatCard from 'src/routes/Home/components/StatCard';
 import { useResubmitStatusQuery } from './useResubmitStatusQuery';
 import { DefaultSpinner } from 'src/components';
 import { useInterval } from 'src/hooks/useInterval';
-import { Subscription } from '../../SubscriptionList/types';
+import { SubscriptionInfo } from '../../Subscription/types';
 
 interface MessageModalProps {
   openResubmitStatusModal: boolean;
-  closeResubmitStatusModal: (updatedSubscription: Subscription) => void;
+  closeResubmitStatusModal: (updatedSubscription: SubscriptionInfo) => void;
   resubmitDlqMessagesResponse: ResubmitDlqMessagesResponse;
 }
 

@@ -33,16 +33,16 @@ namespace MessageReplay.Api.Features.Topics
 
         public async Task<IActionResult> GetTopicSubscriptions(string topicName)
         {
-            var subscriptionsList = new List<GetTopicSubscription>();
+            var subscriptionsList = new List<GetTopicSubscriptionResponse>();
             var subscriptions = await _client.GetSubscriptionsRuntimeInfoAsync(topicName);
 
-            foreach (var subscriptionProp in subscriptions)
+            foreach (var subscriptionInfo in subscriptions)
             {
-                subscriptionsList.Add(new GetTopicSubscription { 
-                    Name = subscriptionProp.SubscriptionName,
-                    ActiveMessageCount = subscriptionProp.MessageCountDetails.ActiveMessageCount,
-                    DeadLetterMessageCount = subscriptionProp.MessageCountDetails.DeadLetterMessageCount,
-                    CreatedAt = subscriptionProp.CreatedAt
+                subscriptionsList.Add(new GetTopicSubscriptionResponse { 
+                    Name = subscriptionInfo.SubscriptionName,
+                    ActiveMessageCount = subscriptionInfo.MessageCountDetails.ActiveMessageCount,
+                    DeadLetterMessageCount = subscriptionInfo.MessageCountDetails.DeadLetterMessageCount,
+                    CreatedAt = subscriptionInfo.CreatedAt
                 });
             }
 
