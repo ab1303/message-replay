@@ -69,9 +69,13 @@ const ResubmitSelectedAlertDialog: React.FC<ResubmitSelectedAlertDialogProps> = 
         },
         onError: (error: AxiosError) => {
           onActionFailure(error);
+          let errorMessage = error.message;
+          if (error.response && error.response.data) {
+            errorMessage = `${errorMessage}. ${error.response.data.message}`;
+          }
           toast({
             title: 'Server Error',
-            description: error.message,
+            description: errorMessage || '',
             status: 'error',
             duration: 3000,
             isClosable: true,

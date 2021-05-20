@@ -1,5 +1,4 @@
 import { SubscriptionInfo } from '../Subscription/types';
-import { SelectedSubscriptionState } from '../SubscriptionList/types';
 
 export type SubscriptionDeadLettersQueryResponse = {
   messageId: string;
@@ -56,8 +55,8 @@ export enum SubscriptionDeadLettersEvent {
   RESUBMIT_ALL_PROCESSED = 'SubscriptionDeadLetters/RESUBMIT_ALL_PROCESSED',
 }
 
-export type SubscriptionDeadLetters = {
+export type SubscriptionDeadLettersMessages = {
   [SubscriptionDeadLettersEvent.RESUBMIT_ALL_PROCESSED]: {
-    subscription: SelectedSubscriptionState;
+    subscription: SubscriptionInfo;
   };
 };

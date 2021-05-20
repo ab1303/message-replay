@@ -23,7 +23,8 @@ import StatCard from 'src/routes/Home/components/StatCard';
 import { useResubmitStatusQuery } from './useResubmitStatusQuery';
 import { DefaultSpinner } from 'src/components';
 import { useInterval } from 'src/hooks/useInterval';
-import { SubscriptionInfo } from '../../Subscription/types';
+import { SubscriptionEvent, SubscriptionInfo } from '../../Subscription/types';
+import { useAppDispatch } from 'src/providers/AppStateProvider';
 
 interface MessageModalProps {
   openResubmitStatusModal: boolean;
@@ -54,6 +55,7 @@ const ResubmitStatusModal: React.FC<MessageModalProps> = ({
   );
 
   const toast = useToast();
+  const appDispatch = useAppDispatch();
 
   const [timerSeconds, setTimerSeconds] = useState<number>(
     toSeconds(!data ? '00:00:00' : data.callBackAfter),
@@ -65,8 +67,15 @@ const ResubmitStatusModal: React.FC<MessageModalProps> = ({
   }, 1000);
 
   useEffect(() => {
-    if (!data) return;
+    if (isFetching || !data) return;
     setTimerSeconds(toSeconds(data.callBackAfter));
+
+    appDispatch({
+      type: SubscriptionEvent.INFO_REFRESH,
+      payload: {
+        subscription: data.subscription,
+      },
+    });
 
     if (!data.inProgress) {
       closeResubmitStatusModal(data.subscription);

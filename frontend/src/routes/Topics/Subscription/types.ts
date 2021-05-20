@@ -20,3 +20,13 @@ export type SubscriptionMessagesQueryResponse = {
 export type SubscriptionMessagesQueryResponsePayload = {
   messages: SubscriptionMessagesQueryResponse[];
 };
+
+export enum SubscriptionEvent {
+  INFO_REFRESH = 'Subscription/REFRESH',
+}
+
+export type SubscriptionMessages = {
+  [SubscriptionEvent.INFO_REFRESH]: {
+    subscription: SubscriptionInfo;
+  };
+};

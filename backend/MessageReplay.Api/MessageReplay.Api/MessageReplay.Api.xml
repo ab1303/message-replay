@@ -21,6 +21,15 @@
             <param name="logger"></param>
             <param name="mapper"></param>
             <param name="topicHelper"></param>
+            <param name="replayMessageService"></param>
+        </member>
+        <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.GetSubscriptionInfo(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="topicName"></param>
+            <param name="subscriptionName"></param>
+            <returns></returns>
         </member>
         <member name="M:MessageReplay.Api.Features.Subscriptions.SubscriptionsController.GetSubscriptionMessages(System.String,System.String)">
             <summary>

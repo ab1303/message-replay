@@ -49,7 +49,8 @@ import { AxiosError } from 'axios';
 
 import DeleteSelectedAlertDialog from './DeleteSelectedAlertDialog';
 import ResubmitSelectedAlertDialog from './ResubmitSelectedAlertDialog';
-import { SubscriptionInfo } from '../Subscription/types';
+import { SubscriptionEvent, SubscriptionInfo } from '../Subscription/types';
+import { useSubscriptionInfoQuery } from '../Subscription/useSubscriptionInfoQuery';
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.visibleColumns.push(columns => [
@@ -132,6 +133,23 @@ const SubscriptionDeadLetters: React.FC = () => {
     topic,
     subscription,
   );
+
+  const {
+    data: subscriptionInfoData,
+    refetch: subscriptionInfoRefetch,
+    isFetching: isSubscriptionInfoFetching,
+  } = useSubscriptionInfoQuery(topic, subscription);
+
+  useEffect(() => {
+    if (isSubscriptionInfoFetching || !subscriptionInfoData) return;
+
+    appDispatch({
+      type: SubscriptionEvent.INFO_REFRESH,
+      payload: {
+        subscription: subscriptionInfoData,
+      },
+    });
+  }, [isSubscriptionInfoFetching, subscriptionInfoData]);
 
   useEffect(() => {
     if (!messageSelectionLockedUntilUtc) return;
@@ -282,7 +300,7 @@ const SubscriptionDeadLetters: React.FC = () => {
               <MdMoreVert />
             </MenuButton>
             <MenuList>
-              <MenuItem>Delete all</MenuItem>
+              {/* <MenuItem>Delete all</MenuItem> */}
               <MenuItem
                 isDisabled={disableSelectedAction}
                 onClick={deleteSelectedHandler}
@@ -401,6 +419,7 @@ const SubscriptionDeadLetters: React.FC = () => {
           subscription={subscription}
           onActionSuccess={data => {
             setMessageSelectionLockedUntilUtc(Date.parse(data.lockedUntilUtc));
+            subscriptionInfoRefetch();
             refetch();
             setResubmitSelectedAlertDialog({
               showDialog: false,
@@ -430,6 +449,7 @@ const SubscriptionDeadLetters: React.FC = () => {
           subscription={subscription}
           onActionSuccess={data => {
             setMessageSelectionLockedUntilUtc(Date.parse(data.lockedUntilUtc));
+            subscriptionInfoRefetch();
             refetch();
             setDeleteSelectedAlertDialog({ showDialog: false, messageIds: [] });
           }}

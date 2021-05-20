@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Box, Text, useColorMode, useToast } from '@chakra-ui/core';
+import { Text, useColorMode, useToast } from '@chakra-ui/core';
 import { AxiosError } from 'axios';
 import ActionAlertDialog, { ActionAlertDialogProps } from 'src/components';
 import { DeleteSelectedDlqMessagesResponse } from '../types';
@@ -24,11 +24,6 @@ const DeleteSelectedAlertDialog: React.FC<DeleteSelectedAlertDialogProps> = ({
   ...props
 }) => {
   const toast = useToast();
-
-  const { colorMode } = useColorMode();
-  const bg = useMemo(() => (colorMode === 'dark' ? 'gray.600' : 'gray.50'), [
-    colorMode,
-  ]);
 
   const {
     mutate: deleteSelectedMutation,
@@ -68,9 +63,13 @@ const DeleteSelectedAlertDialog: React.FC<DeleteSelectedAlertDialogProps> = ({
         },
         onError: (error: AxiosError) => {
           onActionFailure(error);
+          let errorMessage = error.message;
+          if (error.response && error.response.data) {
+            errorMessage = `${errorMessage}. ${error.response.data.message}`;
+          }
           toast({
             title: 'Server Error',
-            description: error.message,
+            description: errorMessage || '',
             status: 'error',
             duration: 3000,
             isClosable: true,

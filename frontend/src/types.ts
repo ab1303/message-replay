@@ -1,9 +1,10 @@
 import { SettingsMessages, SettingsState } from './routes/Settings/types';
-import { SubscriptionDeadLetters } from './routes/Topics/SubscriptionDeadLetters/types';
 import {
-  SelectedSubscriptionState,
-  SubscriptionListMessages,
-} from './routes/Topics/SubscriptionList/types';
+  SubscriptionInfo,
+  SubscriptionMessages,
+} from './routes/Topics/Subscription/types';
+import { SubscriptionDeadLettersMessages } from './routes/Topics/SubscriptionDeadLetters/types';
+import { SubscriptionListMessages } from './routes/Topics/SubscriptionList/types';
 import ActionMap from './utils/actionMap';
 
 export type AppConfigurations = {
@@ -17,12 +18,13 @@ export type AppState = {
     queues: string[];
     topics: string[];
   };
-  selectedSubscription: SelectedSubscriptionState | null;
+  selectedSubscription: SubscriptionInfo | null;
 };
 
 type ApplicationMessages = SettingsMessages &
+  SubscriptionMessages &
   SubscriptionListMessages &
-  SubscriptionDeadLetters;
+  SubscriptionDeadLettersMessages;
 
 export type Actions = ActionMap<ApplicationMessages>[keyof ActionMap<
   ApplicationMessages

@@ -7,16 +7,15 @@ import { Path } from 'src/router';
 import { useSubscriptionsQuery } from './useSubscriptionsQuery';
 import { DATE_FORMAT } from 'src/constants';
 import { useAppDispatch } from 'src/providers/AppStateProvider';
-import { SubscriptionListEvent, SubscriptionsQueryResponse } from './types';
+import { SubscriptionListEvent } from './types';
+import { SubscriptionInfo } from '../Subscription/types';
 
 const SubscriptionList: React.FC = () => {
   const appDispatch = useAppDispatch();
   const { topic } = useParams<{ topic: string }>();
   const { data, isFetched } = useSubscriptionsQuery(topic);
 
-  const selectSubscriptionHandler = (
-    subscription: SubscriptionsQueryResponse,
-  ) =>
+  const selectSubscriptionHandler = (subscription: SubscriptionInfo) =>
     appDispatch({
       type: SubscriptionListEvent.SUBSCRIPTION_SELECTED,
       payload: subscription,

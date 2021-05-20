@@ -1,5 +1,7 @@
 import { settingsReducer } from './routes/Settings/reducer';
 import { SettingsEvent } from './routes/Settings/types';
+import { subscriptionReducer } from './routes/Topics/Subscription/reducer';
+import { SubscriptionEvent } from './routes/Topics/Subscription/types';
 import { SubscriptionDeadLettersEvent } from './routes/Topics/SubscriptionDeadLetters/types';
 import { subscriptionListReducer } from './routes/Topics/SubscriptionList/reducer';
 import { SubscriptionListEvent } from './routes/Topics/SubscriptionList/types';
@@ -53,20 +55,14 @@ export const appReducer = (
         isLoading: false,
         settings: settingsReducer(settings, action),
         entity: entity,
-        selectedSubscription: subscriptionListReducer(
-          selectedSubscription,
-          action,
-        ),
+        selectedSubscription: subscriptionReducer(selectedSubscription, action),
       };
-    case SubscriptionDeadLettersEvent.RESUBMIT_ALL_PROCESSED:
+    case SubscriptionEvent.INFO_REFRESH:
       return {
         isLoading: false,
         settings: settingsReducer(settings, action),
         entity: entity,
-        selectedSubscription: subscriptionListReducer(
-          selectedSubscription,
-          action,
-        ),
+        selectedSubscription: subscriptionReducer(selectedSubscription, action),
       };
     default:
       return {
