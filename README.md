@@ -43,3 +43,8 @@ or
 
     - Application makes the call on the provided app settings which are
     - Application Base Url
+
+
+## Docker Setup
+
+`docker-compose up --build`

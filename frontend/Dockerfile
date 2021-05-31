@@ -1,0 +1,27 @@
+# Name the node stage "builder"
+FROM node:14.16.0 AS builder
+# Set working directory
+WORKDIR /app
+# Copy all files from current directory to working dir in image
+COPY . .
+
+ARG REACT_APP_API_ENDPOINT
+ENV REACT_APP_API_ENDPOINT $REACT_APP_API_ENDPOINT
+RUN echo $REACT_APP_API_ENDPOINT
+
+ARG NODE_ENV
+ENV NODE_ENV $NODE_ENV
+# install node modules and build assets
+RUN yarn install && yarn build
+
+# nginx state for serving content
+FROM nginx:alpine
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+# Set working directory to nginx asset directory
+WORKDIR /usr/share/nginx/html
+# Remove default nginx static assets
+RUN rm -rf ./*
+# Copy static assets from builder stage
+COPY --from=builder /app/build .
+# Containers run nginx with global directives and daemon off
+ENTRYPOINT ["nginx", "-g", "daemon off;"]

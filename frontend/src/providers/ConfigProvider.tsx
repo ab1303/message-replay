@@ -12,6 +12,7 @@ interface Props {
 
 const ConfigProvider: React.FC<Props> = ({ children, appConfig }) => {
   console.log('Configurations:', appConfig);
+  console.log('process env', process.env);
   return (
     <ConfigContext.Provider value={appConfig}>
       {children}

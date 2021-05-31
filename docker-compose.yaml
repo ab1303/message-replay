@@ -1,0 +1,27 @@
+# Use postgres/example user/password credentials
+version: "3.7"
+
+services:
+  backend:
+    container_name: message-replay-api
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    ports:
+      - "7001:80"
+  frontend:
+    container_name: message-replay-web
+    restart: always    
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+      args: 
+        REACT_APP_API_ENDPOINT: http://localhost:7000
+        NODE_ENV: development
+    depends_on:
+      - backend
+    ports:
+      - "7000:80"
