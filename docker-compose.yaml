@@ -10,8 +10,6 @@ services:
     build:
       context: ./backend
       dockerfile: ./Dockerfile
-    ports:
-      - "7001:80"
   frontend:
     container_name: message-replay-web
     restart: always    

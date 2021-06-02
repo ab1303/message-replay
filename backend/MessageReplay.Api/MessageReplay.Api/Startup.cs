@@ -32,7 +32,7 @@ namespace MessageReplay.Api
             services.AddLogging(x => x.AddConsole());
 
             services.AddAutoMapper(typeof(Startup));
-            
+
             services.AddControllers()
                  .AddJsonOptions(options =>
                  {
@@ -54,7 +54,7 @@ namespace MessageReplay.Api
                     builder =>
                     {
                         builder.WithOrigins(
-                            "http://localhost:3000", 
+                            "http://localhost:3000",
                             "http://localhost:7000")
                          .AllowAnyHeader()
                          .AllowAnyMethod();
@@ -72,14 +72,21 @@ namespace MessageReplay.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+            app.UsePathBase($"/docs");
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MessageReplay.Api v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint($"/docs/swagger/v1/swagger.json", "MessageReplay.Api v1");
+                    c.RoutePrefix = "";
+                });
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 

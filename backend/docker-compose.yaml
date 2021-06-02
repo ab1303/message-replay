@@ -1,0 +1,30 @@
+# Use postgres/example user/password credentials
+version: "3.7"
+
+networks:
+  corp:
+    driver: bridge
+
+services:
+  backend:
+    container_name: message-replay-backend-api
+    networks:
+      - corp
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "7001:80"
+  nginx:
+    container_name: nginx
+    networks:
+      - corp
+    build:
+      context: .
+      dockerfile: ./nginx.Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "7000:80"
