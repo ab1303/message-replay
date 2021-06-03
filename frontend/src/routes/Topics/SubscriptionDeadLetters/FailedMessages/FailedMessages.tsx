@@ -17,7 +17,7 @@ const FailedMessages: React.FC<FailedMessagesProps> = ({
       <Text>Failed Messages</Text>
       <Card.Body>
         <Text>{description}</Text>
-        <Box bg={bg} w="100%" p={4}>
+        <Box bg={bg} w="100%" p={4} h={400}>
           <ol>
             {messageIds.map(id => (
               <li key={id}>{id}</li>

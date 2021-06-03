@@ -11,7 +11,7 @@ export const useSubscriptionsQuery = (topicName: string) => {
   const toast = useToast();
 
   const query = useQuery<SubscriptionsQueryResponsePayload, AxiosError>(
-    'subscriptions',
+    `subscriptions-${topicName}`,
     async () => {
       const response = await axios.get<SubscriptionsQueryResponsePayload>(
         `${config.apiEndpoint}/servicebus/topics/${topicName}`,
