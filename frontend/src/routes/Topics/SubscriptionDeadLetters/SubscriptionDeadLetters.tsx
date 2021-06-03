@@ -287,6 +287,7 @@ const SubscriptionDeadLetters: React.FC = () => {
         });
       },
     });
+    setResubmitAllAlertDialog(false);
   };
 
   return (
