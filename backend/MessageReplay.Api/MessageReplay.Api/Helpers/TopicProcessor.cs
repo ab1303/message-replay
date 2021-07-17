@@ -9,24 +9,24 @@ using AzureMessage = Microsoft.Azure.ServiceBus.Message;
 
 namespace MessageReplay.Api.Helpers
 {
-    public class TopicProcessor : IDisposable
+    public class TopicProcessor : ILongRunningProcess ,IDisposable
     {
         private int _maxMessageCount = 100;
         private MessageReceiver _receiver;
         private TopicClient _topicClient;
-        ReplayMessagesLongRunningProcess _replayMessagesLongRunningProcess;
+        readonly LongRunningProcessResponse _longRunningProcessResponse;
 
         public TopicProcessor()
         {
-            _replayMessagesLongRunningProcess = new ReplayMessagesLongRunningProcess();
+            _longRunningProcessResponse = new LongRunningProcessResponse();
 
         }
 
         private void CreateClients(string connectionString, string topicName, string subscriptionName)
         {
             var path = EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName);
-            var deadletterPath = EntityNameHelper.FormatDeadLetterPath(path);
-            _receiver = new MessageReceiver(connectionString, deadletterPath, ReceiveMode.PeekLock);
+            var deadLetterPath = EntityNameHelper.FormatDeadLetterPath(path);
+            _receiver = new MessageReceiver(connectionString, deadLetterPath, ReceiveMode.PeekLock);
             _topicClient = new TopicClient(connectionString, topicName);
         }
 
@@ -53,22 +53,22 @@ namespace MessageReplay.Api.Helpers
             await _receiver.CompleteAsync(message.Select(m => m.SystemProperties.LockToken));
         }
 
-        public async Task<ReplayMessagesLongRunningProcess> GetStatus(string topicName, string subscriptionName)
+        public async Task<LongRunningProcessResponse> GetStatus(string topicName, string subscriptionName)
         {
-            _replayMessagesLongRunningProcess.Subscription =
+            _longRunningProcessResponse.Subscription =
                 await TopicInfoHelper.GetSubscriptionInfo(topicName, subscriptionName);
-            return _replayMessagesLongRunningProcess;
+            return _longRunningProcessResponse;
         }
 
-        public void StartResubmitting(string connectionString, string topicName, string subscriptionName)
+        public void StartLongRunningProcess(string connectionString, string topicName, string subscriptionName)
         {
-            if (_replayMessagesLongRunningProcess.InProgress)
+            if (_longRunningProcessResponse.InProgress)
             {
                 return;
             }
 
-            _replayMessagesLongRunningProcess.InProgress = true;
-            _replayMessagesLongRunningProcess.ProcessId = Guid.NewGuid();
+            _longRunningProcessResponse.InProgress = true;
+            _longRunningProcessResponse.ProcessId = Guid.NewGuid();
 
 
             CreateClients(connectionString, topicName, subscriptionName);
@@ -78,12 +78,12 @@ namespace MessageReplay.Api.Helpers
                 {
                     try
                     {
-                        _replayMessagesLongRunningProcess.Subscription =
+                        _longRunningProcessResponse.Subscription =
                             await TopicInfoHelper.GetSubscriptionInfo(topicName, subscriptionName);
                         var consumedMessagesFromDlq = await ConsumeMessagesFromDlq();
                         if (consumedMessagesFromDlq == null)
                         {
-                            _replayMessagesLongRunningProcess.InProgress = false;
+                            _longRunningProcessResponse.InProgress = false;
                             break;
                         }
 
@@ -91,13 +91,11 @@ namespace MessageReplay.Api.Helpers
                         await PublishMessagesToTopic(messages);
                         await CompleteMessage(messages);
                     }
-                    catch (TimeoutException e)
-                    {
-
-                    }
                     catch (Exception exception)
                     {
-
+                        _longRunningProcessResponse.HasErrors = true;
+                        _longRunningProcessResponse.ErrorTitle = exception.Message;
+                        _longRunningProcessResponse.ErrorStackTrace = exception.ToString();
                     }
                 }
             });
